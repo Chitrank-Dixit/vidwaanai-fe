@@ -25,20 +25,24 @@ export const MessageInput = ({ onSendMessage, isLoading }: MessageInputProps) =>
     };
 
     return (
-        <div className="border-t border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-            <div className="mx-auto flex max-w-4xl gap-4">
+        <div className="border-t border-silver/50 bg-cream/80 p-4 dark:border-purple-dark dark:bg-indigo shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] backdrop-blur-sm">
+            <div className="mx-auto flex max-w-4xl gap-4 items-end">
                 <textarea
                     ref={textareaRef}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="flex-1 resize-none rounded-md border border-slate-300 bg-transparent p-3 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:text-white"
+                    placeholder="Ask Vidwaan..."
+                    className="flex-1 resize-none rounded-lg border border-silver bg-white p-3 focus:border-saffron focus:outline-none focus:ring-2 focus:ring-saffron/20 dark:border-purple-light dark:bg-indigo-light dark:text-white font-body shadow-sm transition-colors text-charcoal placeholder:text-gray-400"
                     rows={1}
-                    style={{ minHeight: '44px', maxHeight: '200px' }}
+                    style={{ minHeight: '50px', maxHeight: '200px' }}
                 />
-                <Button onClick={handleSubmit} disabled={!content.trim() || isLoading} className="h-auto">
-                    <Send size={20} />
+                <Button
+                    onClick={handleSubmit}
+                    disabled={!content.trim() || isLoading}
+                    className="h-[50px] w-[50px] rounded-lg bg-saffron hover:bg-saffron-light text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all"
+                >
+                    {isLoading ? <span className="animate-spin">⏳</span> : <Send size={20} />}
                 </Button>
             </div>
         </div>

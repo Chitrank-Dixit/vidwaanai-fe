@@ -45,8 +45,8 @@ class SocketService {
         });
 
         // Error handling
-        this.socket.on('error', (error: any) => {
-            console.error('Socket error:', error);
+        this.socket.on('connect_error', (err: Error) => {
+            console.error('Socket connection error:', err);
         });
     }
 

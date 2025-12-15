@@ -44,13 +44,18 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-lg dark:bg-slate-800">
+        <div className="relative w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-2xl border-l-4 border-l-saffron border-t border-r border-b border-silver dark:bg-indigo dark:border-purple-dark dark:border-l-gold z-10 transition-transform hover:-translate-y-1 duration-300">
             <div className="text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    Sign in to your account
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-saffron/10 mb-4">
+                    <span className="text-3xl">🕉️</span>
+                </div>
+                <h2 className="text-3xl font-display font-bold tracking-tight text-indigo dark:text-gold">
+                    Sign in to Vidwaan AI
                 </h2>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                    Or use <span className="font-medium text-blue-600">demo@vidwaan.ai</span> / <span className="font-medium text-blue-600">password</span>
+                <p className="mt-2 text-sm text-charcoal/80 dark:text-gray-300 font-body">
+                    Access your spiritual journey.
+                    <br />
+                    Use <span className="font-semibold text-saffron">demo@vidwaan.ai</span> / <span className="font-semibold text-saffron">password</span>
                 </p>
             </div>
 
