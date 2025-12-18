@@ -1,4 +1,4 @@
-import type { Message } from '@/types/chat';
+import type { Message } from '@/api/chat';
 import { cn } from '@/utils/cn';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';

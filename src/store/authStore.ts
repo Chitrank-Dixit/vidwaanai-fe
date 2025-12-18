@@ -1,43 +1,87 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-export interface User {
-    id: string;
-    email: string;
-    name: string;
-    avatar?: string;
-}
+import { authAPI, type LoginRequest, type RegisterRequest } from '../api/auth';
+import type { User } from '../api/types';
 
 interface AuthState {
-    token: string | null;
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    setToken: (token: string) => void;
-    setUser: (user: User) => void;
-    logout: () => void;
-    setError: (error: string | null) => void;
-    setLoading: (isLoading: boolean) => void;
+
+    // Actions
+    login: (credentials: LoginRequest) => Promise<void>;
+    register: (data: RegisterRequest) => Promise<void>;
+    logout: () => Promise<void>;
+    clearError: () => void;
+    checkAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set) => ({
-            token: null,
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-            setToken: (token) => set({ token, isAuthenticated: !!token }),
-            setUser: (user) => set({ user }),
-            logout: () => set({ token: null, user: null, isAuthenticated: false }),
-            setError: (error) => set({ error }),
-            setLoading: (isLoading) => set({ isLoading }),
-        }),
-        {
-            name: 'auth-storage',
-            partialize: (state) => ({ token: state.token, user: state.user, isAuthenticated: state.isAuthenticated }),
+export const useAuthStore = create<AuthState>((set) => ({
+    user: null,
+    isAuthenticated: !!localStorage.getItem('accessToken'),
+    isLoading: false,
+    error: null,
+
+    login: async (credentials) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await authAPI.login(credentials);
+            set({
+                user: response.data.user,
+                isAuthenticated: true,
+                isLoading: false
+            });
+        } catch (error: any) {
+            set({
+                error: error.response?.data?.error || 'Login failed',
+                isLoading: false,
+                isAuthenticated: false
+            });
+            throw error;
         }
-    )
-);
+    },
+
+    register: async (data) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await authAPI.register(data);
+            // Note: Registration might not auto-login depending on backend, 
+            // but commonly we might want to redirect to login or auto-login.
+            // Here we just update state if user is returned.
+            if (response.data.user) {
+                set({ user: response.data.user });
+            }
+            set({ isLoading: false });
+        } catch (error: any) {
+            set({
+                error: error.response?.data?.error || 'Registration failed',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
+    logout: async () => {
+        set({ isLoading: true });
+        try {
+            await authAPI.logout();
+        } catch (error) {
+            console.error('Logout error', error);
+        } finally {
+            // Clear local state regardless of server response
+            set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null
+            });
+        }
+    },
+
+    clearError: () => set({ error: null }),
+
+    checkAuth: () => {
+        const token = localStorage.getItem('accessToken');
+        set({ isAuthenticated: !!token });
+    }
+}));

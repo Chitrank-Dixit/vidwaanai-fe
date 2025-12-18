@@ -1,56 +1,30 @@
 import { useEffect } from 'react';
-import { useChatStore } from '@/store/chatStore';
-import { socketService } from '@/services/socketService';
+import { useChat } from '@/hooks/useChat';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
-import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/hooks/useAuth';
 
 export const ChatWindow = () => {
-    const { messages, addMessage } = useChatStore();
-    const user = useAuthStore((state) => state.user);
+    const { messages, sendMessage, loadMessages, currentConversation, isSending } = useChat();
+    const { user } = useAuth();
 
     useEffect(() => {
-        socketService.connect();
-        return () => {
-            socketService.disconnect();
+        // For now, if no conversation is selected, we could create one or select default
+        // This logic might need to be expanded to auto-select or show a sidebar
+        if (currentConversation) {
+            loadMessages(currentConversation.id);
         }
-    }, []);
+    }, [currentConversation, loadMessages]);
 
-    const handleSendMessage = (content: string) => {
+    const handleSendMessage = async (content: string) => {
         if (!user) return;
-
-        // Optimistic update
-        const newMessage = {
-            id: Date.now().toString(),
-            conversationId: 'default',
-            userId: user.id,
-            content,
-            role: 'user' as const,
-            createdAt: new Date().toISOString(),
-            status: 'sending' as const,
-        };
-
-        addMessage(newMessage);
-        socketService.sendMessage(content, 'default');
-
-        // Mock response for MVP without backend
-        setTimeout(() => {
-            const botMessage = {
-                id: (Date.now() + 1).toString(),
-                conversationId: 'default',
-                userId: 'bot',
-                content: `Echo: ${content}`,
-                role: 'assistant' as const,
-                createdAt: new Date().toISOString(),
-            };
-            addMessage(botMessage);
-        }, 1000);
+        await sendMessage(content);
     };
 
     return (
         <div className="flex h-full flex-col bg-cream font-sans">
             <MessageList messages={messages} />
-            <MessageInput onSendMessage={handleSendMessage} isLoading={false} />
+            <MessageInput onSendMessage={handleSendMessage} isLoading={isSending} />
         </div>
     );
 };

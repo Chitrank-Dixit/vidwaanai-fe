@@ -34,7 +34,8 @@ export const MessageInput = ({ onSendMessage, isLoading }: MessageInputProps) =>
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Ask Vidwaan..."
-                        className="w-full resize-none rounded-lg border-2 border-silver bg-white p-4 pr-12 text-charcoal placeholder:text-gray-400 focus:border-saffron focus:outline-none focus:ring-4 focus:ring-saffron/10 font-body shadow-sm transition-all"
+                        disabled={isLoading}
+                        className="w-full resize-none rounded-lg border-2 border-silver bg-white p-4 pr-12 text-charcoal placeholder:text-gray-400 focus:border-saffron focus:outline-none focus:ring-4 focus:ring-saffron/10 font-body shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         rows={1}
                         style={{ minHeight: '60px', maxHeight: '200px' }}
                     />

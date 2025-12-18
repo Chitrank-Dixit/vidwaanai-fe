@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authService } from '@/services/authService';
-import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { useNavigate } from 'react-router-dom';
@@ -18,8 +17,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
     const [error, setError] = useState<string | null>(null);
-    const isLoading = useAuthStore((state) => state.isLoading);
-    const setLoading = useAuthStore((state) => state.setLoading);
+    const { login, isLoading } = useAuth();
     const navigate = useNavigate();
 
     const {
@@ -32,15 +30,12 @@ export const LoginForm = () => {
 
     const onSubmit = async (data: LoginFormValues) => {
         setError(null);
-        setLoading(true);
         try {
-            await authService.login(data);
+            await login(data);
             navigate('/chat');
-        } catch (err) {
-            setError('Invalid email or password');
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Invalid email or password');
             console.error(err);
-        } finally {
-            setLoading(false);
         }
     };
 
