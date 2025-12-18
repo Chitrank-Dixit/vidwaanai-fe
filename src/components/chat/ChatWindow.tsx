@@ -48,7 +48,7 @@ export const ChatWindow = () => {
     };
 
     return (
-        <div className="flex h-full flex-col bg-cream/50 dark:bg-slate-950">
+        <div className="flex h-full flex-col bg-cream font-sans">
             <MessageList messages={messages} />
             <MessageInput onSendMessage={handleSendMessage} isLoading={false} />
         </div>

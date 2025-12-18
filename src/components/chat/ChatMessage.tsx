@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { User } from 'lucide-react';
+import { User, Bot } from 'lucide-react';
 
 interface ChatMessageProps {
     message: Message;
@@ -15,35 +15,27 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
     return (
         <div
             className={cn(
-                'flex w-full items-start gap-4 p-4',
+                'flex w-full items-start gap-4 p-4 hover:bg-black/[0.02] transition-colors group',
                 isUser ? 'flex-row-reverse' : ''
             )}
         >
             <div
                 className={cn(
-                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md z-10',
-                    isUser ? 'bg-saffron text-white border-2 border-white' : 'bg-white text-purple border-2 border-purple/20'
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm z-10 border-2 bg-white',
+                    isUser ? 'border-saffron text-saffron' : 'border-purple text-purple'
                 )}
             >
-                {isUser ? <User size={20} /> : <span className="text-xl">🕉️</span>}
+                {isUser ? <User size={20} /> : <Bot size={20} />}
             </div>
 
             <div className={cn(
-                'flex-1 space-y-2 overflow-hidden rounded-2xl p-4 shadow-sm relative max-w-[85%]',
+                'flex-1 space-y-2 rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-shadow relative max-w-[80%] bg-white border-l-4 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]',
                 isUser
-                    ? 'bg-saffron text-white rounded-tr-none shadow-md'
-                    : 'bg-white text-charcoal border border-silver rounded-tl-none shadow-sm dark:bg-indigo-light dark:text-gray-100'
+                    ? 'border-l-saffron rounded-tr-none'
+                    : 'border-l-purple rounded-tl-none'
             )}>
-                {/* Decorative Corner for Agent */}
-                {!isUser && (
-                    <div className="absolute top-0 left-0 h-4 w-4">
-                        <svg viewBox="0 0 10 10" className="text-silver fill-current opacity-50">
-                            <path d="M0 0 L10 0 L0 10 Z" />
-                        </svg>
-                    </div>
-                )}
 
-                <div className={cn("prose max-w-none break-words font-body", isUser ? "prose-invert text-white marker:text-white/70" : "prose-stone dark:prose-invert")}>
+                <div className="prose prose-stone max-w-none break-words font-body text-charcoal">
                     <ReactMarkdown
                         components={{
                             code({ inline, className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean }) {
@@ -59,21 +51,30 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
                                         {String(children).replace(/\n$/, '')}
                                     </SyntaxHighlighter>
                                 ) : (
-                                    <code className={cn("rounded px-1 py-0.5 font-medium", isUser ? "bg-white/20 text-white" : "bg-black/5 text-purple")} {...props}>
+                                    <code className="bg-cream-light border border-silver rounded px-1.5 py-0.5 font-medium text-purple text-sm" {...props}>
                                         {children}
                                     </code>
                                 );
                             },
-                            p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                            p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-charcoal/90">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1 text-charcoal/90">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1 text-charcoal/90">{children}</ol>,
+                            blockquote: ({ children }) => <blockquote className="border-l-4 border-gold pl-4 italic text-charcoal/80 my-2">{children}</blockquote>
                         }}
                     >
                         {message.content}
                     </ReactMarkdown>
                 </div>
-                <div className={cn("text-xs mt-2 flex items-center gap-1", isUser ? "text-white/70" : "text-charcoal/50")}>
-                    {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-silver/30">
+                    <span className="text-xs text-charcoal/50 font-medium">
+                        {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    {/* Action Buttons Placeholder */}
+                    <div className="hidden group-hover:flex gap-2">
+                        <button className="text-xs text-saffron hover:bg-saffron/10 px-2 py-1 rounded transition-colors">Copy</button>
+                        <button className="text-xs text-saffron hover:bg-saffron/10 px-2 py-1 rounded transition-colors">Share</button>
+                    </div>
                 </div>
             </div>
         </div>

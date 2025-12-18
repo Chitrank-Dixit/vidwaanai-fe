@@ -17,6 +17,12 @@
     /* Charcoal */
   }
 
+  html {
+    background: var(--color-cream-primary);
+    /* ⭐ Root element */
+    height: 100%;
+  }
+
   .dark {
     --background: 222 58% 25%;
     /* Deep Indigo */
@@ -26,6 +32,8 @@
 
   body {
     @apply bg-cream text-charcoal font-body antialiased selection:bg-saffron/30;
+    min-height: 100vh;
+    /* ⭐ Prevent overflow gaps */
   }
 
   h1,

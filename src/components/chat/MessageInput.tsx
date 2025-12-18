@@ -25,24 +25,26 @@ export const MessageInput = ({ onSendMessage, isLoading }: MessageInputProps) =>
     };
 
     return (
-        <div className="border-t border-silver/50 bg-cream/80 p-4 dark:border-purple-dark dark:bg-indigo shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] backdrop-blur-sm">
+        <div className="border-t border-silver bg-cream p-4 shrink-0">
             <div className="mx-auto flex max-w-4xl gap-4 items-end">
-                <textarea
-                    ref={textareaRef}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Ask Vidwaan..."
-                    className="flex-1 resize-none rounded-lg border border-silver bg-white p-3 focus:border-saffron focus:outline-none focus:ring-2 focus:ring-saffron/20 dark:border-purple-light dark:bg-indigo-light dark:text-white font-body shadow-sm transition-colors text-charcoal placeholder:text-gray-400"
-                    rows={1}
-                    style={{ minHeight: '50px', maxHeight: '200px' }}
-                />
+                <div className="flex-1 relative">
+                    <textarea
+                        ref={textareaRef}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Ask Vidwaan..."
+                        className="w-full resize-none rounded-lg border-2 border-silver bg-white p-4 pr-12 text-charcoal placeholder:text-gray-400 focus:border-saffron focus:outline-none focus:ring-4 focus:ring-saffron/10 font-body shadow-sm transition-all"
+                        rows={1}
+                        style={{ minHeight: '60px', maxHeight: '200px' }}
+                    />
+                </div>
                 <Button
                     onClick={handleSubmit}
                     disabled={!content.trim() || isLoading}
-                    className="h-[50px] w-[50px] rounded-lg bg-saffron hover:bg-saffron-light text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all"
+                    className="h-[60px] w-auto px-6 rounded-lg bg-saffron hover:bg-saffron-light text-white font-bold shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all flex items-center gap-2"
                 >
-                    {isLoading ? <span className="animate-spin">⏳</span> : <Send size={20} />}
+                    {isLoading ? <span className="animate-spin">⏳</span> : <><span>Send</span> <Send size={18} /></>}
                 </Button>
             </div>
         </div>

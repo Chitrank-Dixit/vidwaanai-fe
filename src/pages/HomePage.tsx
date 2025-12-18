@@ -1,5 +1,6 @@
 import { Button } from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 export const HomePage = () => {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ export const HomePage = () => {
                 <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-pulse-ring"></div>
                 <div className="relative z-10 max-w-4xl mx-auto space-y-6">
                     <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white border-2 border-gold shadow-lg mb-8">
-                        <span className="text-5xl">🕉️</span>
+                        <Sparkles className="h-12 w-12 text-saffron" />
                     </div>
                     <h1 className="text-5xl md:text-7xl font-display font-bold text-saffron drop-shadow-sm tracking-tight">
                         Vidwaan AI
@@ -63,7 +64,7 @@ export const HomePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {['Bhagavad Gita', 'Vedas', 'Upanishads'].map((item) => (
                             <div key={item} className="bg-white p-8 rounded-lg shadow-sm border border-silver/50 hover:shadow-md hover:border-saffron/50 transition-all cursor-pointer group text-center">
-                                <h3 className="text-xl font-bold text-indigo group-hover:text-saffron transition-colors mb-2">{item}</h3>
+                                <h3 className="text-xl font-bold text-charcoal group-hover:text-saffron transition-colors mb-2">{item}</h3>
                                 <p className="text-charcoal/60 text-sm">Discover ancient wisdom and teachings.</p>
                             </div>
                         ))}
