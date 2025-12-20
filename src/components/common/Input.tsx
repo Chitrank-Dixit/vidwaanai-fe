@@ -1,38 +1,39 @@
-import { type InputHTMLAttributes, forwardRef } from 'react';
-import { cn } from '@/utils/cn';
+import React, { forwardRef } from 'react';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, error, ...props }, ref) => {
-        const inputId = props.id || props.name;
+    ({ label, error, className, id, ...props }, ref) => {
+        const inputId = id || props.name;
 
         return (
             <div className="w-full">
                 {label && (
-                    <label
-                        htmlFor={inputId}
-                        className="mb-2 block text-sm font-medium text-charcoal dark:text-cream"
-                    >
+                    <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {label}
                     </label>
                 )}
                 <input
-                    id={inputId}
-                    className={cn(
-                        'flex h-10 w-full rounded-md border border-silver bg-white px-3 py-2 text-sm text-charcoal placeholder:text-gray-400 focus:border-saffron focus:outline-none focus:ring-2 focus:ring-saffron/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-purple-dark dark:bg-indigo-light dark:text-white',
-                        error && 'border-petal focus:border-petal focus:ring-petal/20',
-                        className
-                    )}
                     ref={ref}
+                    id={inputId}
+                    className={twMerge(
+                        clsx(
+                            "block w-full rounded-md border-silver bg-white px-3 py-2 text-charcoal shadow-sm focus:border-saffron focus:ring-saffron dark:bg-indigo-dark dark:border-gray-600 dark:text-white dark:focus:ring-gold sm:text-sm",
+                            error && "border-red-500 focus:border-red-500 focus:ring-red-500",
+                            className
+                        )
+                    )}
                     {...props}
                 />
-                {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+                {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
             </div>
         );
     }
 );
+
 Input.displayName = 'Input';

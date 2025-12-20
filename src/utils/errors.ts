@@ -1,12 +1,19 @@
 import { AxiosError } from 'axios';
 
 export class APIError extends Error {
+    public statusCode: number;
+    public override message: string;
+    public details?: Record<string, any>;
+
     constructor(
-        public statusCode: number,
-        public message: string,
-        public details?: Record<string, any>
+        statusCode: number,
+        message: string,
+        details?: Record<string, any>
     ) {
         super(message);
+        this.statusCode = statusCode;
+        this.message = message;
+        this.details = details;
         this.name = 'APIError';
     }
 }
