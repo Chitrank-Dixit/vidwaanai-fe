@@ -16,22 +16,17 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Install serve to run static files
-RUN npm install -g serve
+# Production stage
+FROM nginx:alpine
 
 # Copy built assets from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
-EXPOSE 3000
+EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-
-# Start application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
