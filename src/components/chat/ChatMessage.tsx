@@ -1,82 +1,103 @@
-import type { Message } from '@/api/chat';
-import { cn } from '@/utils/cn';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { User, Bot } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { User, Sparkles, BookOpen } from 'lucide-react';
+import { Card } from '../ui/Card';
 
-interface ChatMessageProps {
-    message: Message;
+// Types
+export interface MessageEntity {
+    name: string;
+    type: string;
+    description?: string;
 }
 
-export const ChatMessage = ({ message }: ChatMessageProps) => {
-    const isUser = message.role === 'user';
+export interface MessageSource {
+    title: string;
+    ref: string;
+}
 
-    return (
-        <div
-            className={cn(
-                'flex w-full items-start gap-4 p-4 hover:bg-black/[0.02] transition-colors group',
-                isUser ? 'flex-row-reverse' : ''
-            )}
-        >
-            <div
-                className={cn(
-                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm z-10 border-2 bg-white',
-                    isUser ? 'border-saffron text-saffron' : 'border-purple text-purple'
-                )}
-            >
-                {isUser ? <User size={20} /> : <Bot size={20} />}
+export interface MessageProps {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    entities?: MessageEntity[];
+    sources?: MessageSource[];
+    onEntityClick?: (entity: string) => void;
+}
+
+export const UserMessage: React.FC<{ content: string }> = ({ content }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-end mb-6"
+    >
+        <div className="max-w-[85%] md:max-w-2xl flex gap-3 flex-row-reverse">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-surface-hover flex items-center justify-center border border-white/10">
+                <User className="w-5 h-5 text-text-secondary" />
             </div>
-
-            <div className={cn(
-                'flex-1 space-y-2 rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-shadow relative max-w-[80%] bg-white border-l-4 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]',
-                isUser
-                    ? 'border-l-saffron rounded-tr-none'
-                    : 'border-l-purple rounded-tl-none'
-            )}>
-
-                <div className="prose prose-stone max-w-none break-words font-body text-charcoal">
-                    <ReactMarkdown
-                        components={{
-                            code({ inline, className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean }) {
-                                const match = /language-(\w+)/.exec(className || '');
-                                return !inline && match ? (
-                                    <SyntaxHighlighter
-                                        style={vscDarkPlus as any}
-                                        language={match[1]}
-                                        PreTag="div"
-                                        customStyle={{ borderRadius: '0.5rem', margin: '1rem 0' }}
-                                        {...props}
-                                    >
-                                        {String(children).replace(/\n$/, '')}
-                                    </SyntaxHighlighter>
-                                ) : (
-                                    <code className="bg-cream-light border border-silver rounded px-1.5 py-0.5 font-medium text-purple text-sm" {...props}>
-                                        {children}
-                                    </code>
-                                );
-                            },
-                            p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed text-charcoal/90">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1 text-charcoal/90">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1 text-charcoal/90">{children}</ol>,
-                            blockquote: ({ children }) => <blockquote className="border-l-4 border-gold pl-4 italic text-charcoal/80 my-2">{children}</blockquote>
-                        }}
-                    >
-                        {message.content}
-                    </ReactMarkdown>
-                </div>
-
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-silver/30">
-                    <span className="text-xs text-charcoal/50 font-medium">
-                        {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    {/* Action Buttons Placeholder */}
-                    <div className="hidden group-hover:flex gap-2">
-                        <button className="text-xs text-saffron hover:bg-saffron/10 px-2 py-1 rounded transition-colors">Copy</button>
-                        <button className="text-xs text-saffron hover:bg-saffron/10 px-2 py-1 rounded transition-colors">Share</button>
-                    </div>
-                </div>
+            <div className="bg-gradient-to-br from-primary to-secondary text-white rounded-2xl rounded-tr-sm px-5 py-3 shadow-lg">
+                <p className="text-base leading-relaxed whitespace-pre-wrap">{content}</p>
             </div>
         </div>
-    );
+    </motion.div>
+);
+
+export const AssistantMessage: React.FC<MessageProps> = ({ content, entities, sources, onEntityClick }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-start mb-8"
+    >
+        <div className="max-w-[90%] md:max-w-3xl flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 mt-1">
+                <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+
+            <div className="flex-1 space-y-4">
+                {/* Main Content */}
+                <Card className="bg-surface border-text-tertiary/10 !p-5 leading-relaxed text-text-primary shadow-sm hover:shadow-md transition-shadow">
+                    <div className="prose prose-invert max-w-none">
+                        {/* We can use ReactMarkdown here later */}
+                        <p className="whitespace-pre-wrap">{content}</p>
+                    </div>
+                </Card>
+
+                {/* Entities Context */}
+                {entities && entities.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {entities.map((entity, i) => (
+                            <span
+                                onClick={() => onEntityClick?.(entity.name)}
+                                key={i}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-hover border border-text-tertiary/10 text-xs text-text-secondary cursor-pointer hover:border-primary/50 hover:text-primary transition-colors"
+                            >
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                {entity.name}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
+                {/* Sources Context */}
+                {sources && sources.length > 0 && (
+                    <div className="bg-surface/50 rounded-lg p-3 border border-text-tertiary/10">
+                        <h4 className="flex items-center gap-2 text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">
+                            <BookOpen className="w-3 h-3" /> Sources
+                        </h4>
+                        <div className="space-y-1">
+                            {sources.map((src, i) => (
+                                <div key={i} className="text-sm text-text-secondary hover:text-primary cursor-pointer transition-colors truncate">
+                                    {src.ref} • {src.title}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    </motion.div>
+);
+
+export const ChatMessage: React.FC<{ message: MessageProps }> = ({ message }) => {
+    if (message.role === 'user') return <UserMessage content={message.content} />;
+    return <AssistantMessage {...message} />;
 };

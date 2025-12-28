@@ -4,62 +4,66 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    darkMode: 'class', // Enable dark mode
     theme: {
         extend: {
             colors: {
-                // Primary Colors
-                cream: {
-                    DEFAULT: '#F9F7F3', // Soft Cream - Main BG
-                    light: '#FAF8F5',   // Lighter Cream - Alt BG
+                // BharatGPT Dark Theme
+                background: '#0F0F0F',
+                surface: {
+                    DEFAULT: '#1A1A1A',
+                    hover: '#252525',
+                    active: '#2E2E2E',
                 },
-                saffron: {
-                    DEFAULT: '#D4A017', // Deep Saffron - Primary Action
-                    light: '#E8B83B',   // Light Saffron
-                    dark: '#B8900F',    // Dark Saffron
+                text: {
+                    primary: '#F5F5F5',
+                    secondary: '#A9A9A9',
+                    tertiary: '#6B7280',
+                    inverse: '#0F0F0F',
                 },
-                gold: {
-                    DEFAULT: '#FFD700', // Sacred Gold - Accents
-                    dark: '#E8B800',
+                primary: {
+                    DEFAULT: '#4DB8C6', // Teal accent
+                    dark: '#3A96A3',
                 },
-                purple: {
-                    DEFAULT: '#5D4E8F', // Vedic Purple - Secondary
-                    light: '#6F5FA3',
-                    dark: '#4A3D6B',
+                secondary: {
+                    DEFAULT: '#3B82F6', // Blue accent
+                    dark: '#2563EB',
                 },
-                indigo: {
-                    DEFAULT: '#1B3166', // Deep Indigo - Dark Mode BG
-                    light: '#2C3D5E',
-                    dark: '#0F1A3C',
-                },
-                // Neutrals
-                white: '#FFFFFF',     // Divine White - Cards
-                charcoal: '#2C2C2C',  // Charcoal Dark - Text
-                silver: '#E0E0E0',    // Silver Gray - Borders
+                accent: '#60A5FA', // Light blue
 
-                // Secondary Colors
-                lotus: '#F1B2D0',
-                emerald: '#4B9B5A',
-                sky: '#4A9ED8',
-                earth: '#6B4C3A',
-                petal: '#9B1B30',
+                // Functional
+                success: '#10B981',
+                error: '#EF4444',
+                warning: '#F59E0B',
+                info: '#3B82F6',
             },
             fontFamily: {
-                display: ['"Playfair Display"', 'serif'],
-                heading: ['"Poppins"', 'sans-serif'],
-                body: ['"Inter"', 'sans-serif'],
-                serif: ['"Cormorant Garamond"', 'serif'],
+                sans: ['"Inter"', 'system-ui', 'sans-serif'], // Primary UI font
+                mono: ['"Fira Code"', '"JetBrains Mono"', 'monospace'], // Code font
+                display: ['"Inter"', 'system-ui', 'sans-serif'], // Headings
+            },
+            fontSize: {
+                'display-1': ['3.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+                'display-2': ['2.5rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+            },
+            borderRadius: {
+                'sm': '6px',
+                'md': '10px',
+                'lg': '12px',
+            },
+            boxShadow: {
+                'sm': '0 1px 2px rgba(0, 0, 0, 0.3)',
+                'md': '0 4px 12px rgba(0, 0, 0, 0.4)',
+                'lg': '0 12px 32px rgba(0, 0, 0, 0.5)',
+                'xl': '0 20px 48px rgba(0, 0, 0, 0.6)',
+                'glow': '0 0 20px rgba(77, 184, 198, 0.3)', // Teal glow
             },
             animation: {
-                'pulse-ring': 'pulse-ring 1.5s infinite',
-                'float': 'float 3s ease-in-out infinite',
-            },
-            keyframes: {
-                float: {
-                    '0%, 100%': { transform: 'translateY(0)' },
-                    '50%': { transform: 'translateY(-5px)' },
-                },
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'spin-slow': 'spin 3s linear infinite',
             },
         },
     },
     plugins: [],
 }
+

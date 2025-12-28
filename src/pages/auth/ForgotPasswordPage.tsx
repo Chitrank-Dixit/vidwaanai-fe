@@ -26,18 +26,18 @@ export const ForgotPasswordPage: React.FC = () => {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-cream px-4 py-12 dark:bg-indigo-dark sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 text-text-primary sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply"></div>
-            <div className="relative w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-2xl border-l-4 border-l-saffron border-t border-r border-b border-silver dark:bg-indigo dark:border-purple-dark dark:border-l-gold z-10">
+            <div className="relative w-full max-w-md space-y-8 rounded-xl bg-surface p-8 shadow-2xl border-l-4 border-l-primary border-t border-r border-b border-text-tertiary/10 z-10">
                 <div className="text-center">
-                    <Link to="/auth/login" className="text-saffron hover:text-saffron-dark text-sm font-medium mb-4 inline-block">
+                    <Link to="/auth/login" className="text-primary hover:text-primary-hover text-sm font-medium mb-4 inline-block">
                         ← Back to Login
                     </Link>
-                    <h2 className="text-2xl font-display font-bold tracking-tight text-saffron dark:text-gold">
+                    <h2 className="text-2xl font-display font-bold tracking-tight text-primary">
                         Reset Password
                     </h2>
-                    <p className="mt-2 text-sm text-charcoal/80 dark:text-gray-300">
+                    <p className="mt-2 text-sm text-text-secondary">
                         {success
                             ? 'Check your email for reset instructions'
                             : 'Enter your email to receive a password reset link'}
@@ -58,7 +58,7 @@ export const ForgotPasswordPage: React.FC = () => {
                             />
                         </div>
 
-                        {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/50 dark:text-red-200">{error}</div>}
+                        {error && <div className="rounded-md bg-red-500/10 p-4 text-sm text-red-500">{error}</div>}
 
                         <Button type="submit" className="w-full" isLoading={isLoading}>
                             {isLoading ? 'Sending...' : 'Send Reset Link'}
@@ -70,13 +70,13 @@ export const ForgotPasswordPage: React.FC = () => {
                             <span className="text-green-600 text-xl">✓</span>
                         </div>
                         <div className="space-y-2">
-                            <p className="text-charcoal dark:text-gray-200">
-                                We've sent a password reset link to <strong className="text-saffron">{email}</strong>
+                            <p className="text-text-primary">
+                                We've sent a password reset link to <strong className="text-primary">{email}</strong>
                             </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Check your email and follow the instructions.</p>
+                            <p className="text-sm text-text-tertiary">Check your email and follow the instructions.</p>
                         </div>
 
-                        <Link to="/auth/login" className="block w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-saffron hover:bg-saffron-dark focus:outline-none transition-colors">
+                        <Link to="/auth/login" className="block w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none transition-colors">
                             Back to Login
                         </Link>
                     </div>

@@ -15,6 +15,8 @@ export interface Message {
     content: string;
     role: 'user' | 'assistant';
     createdAt: string;
+    entities?: Array<{ name: string; type: string }>;
+    sources?: Array<{ title: string; ref: string }>;
     metadata?: Record<string, any>;
 }
 

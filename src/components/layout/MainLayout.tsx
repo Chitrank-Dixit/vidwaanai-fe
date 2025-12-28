@@ -12,7 +12,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-cream dark:bg-indigo-dark text-charcoal dark:text-gray-100">
+        <div className="flex h-screen overflow-hidden bg-background text-text-primary">
             {/* Sidebar (Desktop) */}
             <div className="hidden lg:block relative z-20">
                 <Sidebar isOpen={sidebarOpen} />

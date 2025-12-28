@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth } from '@/hooks/useAuth';
 
 // Auth Pages
-import { LandingPage } from '@/pages/LandingPage';
+import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
@@ -13,7 +13,7 @@ import { OAuthCallbackPage } from '@/pages/auth/OAuthCallbackPage';
 
 // Main Pages
 import { Dashboard } from '@/pages/Dashboard';
-import { ChatPage } from '@/pages/ChatPage'; // Need to insure this exists and exports ChatPage
+import { ChatInterface } from '@/pages/ChatInterface';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { ScripturesPage } from '@/pages/ScripturesPage';
@@ -61,7 +61,7 @@ export const App: React.FC = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/auth/register" element={<RegisterPage />} />
         <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
@@ -82,7 +82,7 @@ export const App: React.FC = () => {
           path="/chat"
           element={
             <ProtectedRouteComponent>
-              <ChatPage />
+              <ChatInterface />
             </ProtectedRouteComponent>
           }
         />

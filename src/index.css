@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,42 +6,33 @@
 
 @layer base {
   :root {
-    --color-cream-primary: #F9F7F3;
-    --color-saffron-primary: #D4A017;
-    --color-gold-primary: #FFD700;
-    --color-purple-primary: #5D4E8F;
-    --color-indigo-primary: #1B3166;
-
-    --background: var(--color-cream-primary);
-    --foreground: #2C2C2C;
-    /* Charcoal */
+    /* BharatGPT Base Colors */
+    --background: #0F0F0F;
+    --foreground: #F5F5F5;
   }
 
   html {
-    background: var(--color-cream-primary);
-    /* ⭐ Root element */
+    background-color: var(--background);
+    color: var(--foreground);
     height: 100%;
   }
 
-  .dark {
-    --background: 222 58% 25%;
-    /* Deep Indigo */
-    --foreground: 0 0% 100%;
-    /* White */
-  }
-
   body {
-    @apply bg-cream text-charcoal font-body antialiased selection:bg-saffron/30;
+    @apply bg-background text-text-primary font-sans antialiased selection:bg-primary/30;
     min-height: 100vh;
-    /* ⭐ Prevent overflow gaps */
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-heading text-charcoal;
+  /* Custom Scrollbar for Webkit */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-active rounded-full hover:bg-text-tertiary;
   }
 }

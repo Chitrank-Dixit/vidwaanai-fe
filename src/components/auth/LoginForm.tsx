@@ -40,18 +40,18 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="relative w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-2xl border-l-4 border-l-saffron border-t border-r border-b border-silver dark:bg-indigo dark:border-purple-dark dark:border-l-gold z-10 transition-transform hover:-translate-y-1 duration-300">
+        <div className="relative w-full max-w-md space-y-8 rounded-xl bg-surface p-8 shadow-2xl border-l-4 border-l-primary border-t border-r border-b border-text-tertiary/10 z-10 transition-transform hover:-translate-y-1 duration-300">
             <div className="text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-saffron/10 mb-4">
-                    <Sparkles className="h-8 w-8 text-saffron" />
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                    <Sparkles className="h-8 w-8 text-primary" />
                 </div>
-                <h2 className="text-3xl font-display font-bold tracking-tight text-saffron dark:text-gold">
+                <h2 className="text-3xl font-display font-bold tracking-tight text-primary">
                     Sign in to Vidwaan AI
                 </h2>
-                <p className="mt-2 text-sm text-charcoal/80 dark:text-gray-300 font-body">
+                <p className="mt-2 text-sm text-text-secondary font-body">
                     Access your spiritual journey.
                     <br />
-                    Use <span className="font-semibold text-saffron">demo@vidwaan.ai</span> / <span className="font-semibold text-saffron">password</span>
+                    Use <span className="font-semibold text-primary">demo@vidwaan.ai</span> / <span className="font-semibold text-primary">password</span>
                 </p>
             </div>
 

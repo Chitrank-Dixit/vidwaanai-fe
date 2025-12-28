@@ -23,29 +23,29 @@ export const SettingsPage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-5">
-                <h1 className="text-3xl font-display font-bold leading-tight text-charcoal dark:text-white">
+                <h1 className="text-3xl font-display font-bold leading-tight text-text-primary">
                     Settings
                 </h1>
             </div>
 
             <div className="space-y-6">
                 {/* Display Prefs */}
-                <div className="bg-white dark:bg-indigo shadow rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+                <div className="bg-surface shadow rounded-lg overflow-hidden border border-text-tertiary/10">
                     <div className="px-4 py-5 sm:p-6">
-                        <h2 className="text-lg font-medium leading-6 text-charcoal dark:text-white mb-4">Display Preferences</h2>
+                        <h2 className="text-lg font-medium leading-6 text-text-primary mb-4">Display Preferences</h2>
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 text-sm">
+                            <div className="flex items-center justify-between py-2 border-b border-text-tertiary/10 last:border-0 text-sm">
                                 <div>
-                                    <label className="font-medium text-charcoal dark:text-gray-200 block">Theme</label>
-                                    <p className="text-gray-500 dark:text-gray-400">Choose your preferred interface theme</p>
+                                    <label className="font-medium text-text-primary block">Theme</label>
+                                    <p className="text-text-secondary">Choose your preferred interface theme</p>
                                 </div>
                                 <select
                                     value={settings.theme}
                                     onChange={(e) =>
                                         setSettings({ ...settings, theme: e.target.value })
                                     }
-                                    className="mt-1 block w-32 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-indigo-dark py-2 pl-3 pr-10 text-base focus:border-saffron focus:outline-none focus:ring-saffron sm:text-sm text-charcoal dark:text-white"
+                                    className="mt-1 block w-32 rounded-md border-text-tertiary/20 bg-surface-hover py-2 pl-3 pr-10 text-base focus:border-primary focus:outline-none focus:ring-primary sm:text-sm text-text-primary"
                                 >
                                     <option value="light">Light</option>
                                     <option value="dark">Dark</option>
@@ -53,17 +53,17 @@ export const SettingsPage: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 text-sm">
+                            <div className="flex items-center justify-between py-2 border-b border-text-tertiary/10 last:border-0 text-sm">
                                 <div>
-                                    <label className="font-medium text-charcoal dark:text-gray-200 block">Language</label>
-                                    <p className="text-gray-500 dark:text-gray-400">Select your preferred language</p>
+                                    <label className="font-medium text-text-primary block">Language</label>
+                                    <p className="text-text-secondary">Select your preferred language</p>
                                 </div>
                                 <select
                                     value={settings.language}
                                     onChange={(e) =>
                                         setSettings({ ...settings, language: e.target.value })
                                     }
-                                    className="mt-1 block w-32 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-indigo-dark py-2 pl-3 pr-10 text-base focus:border-saffron focus:outline-none focus:ring-saffron sm:text-sm text-charcoal dark:text-white"
+                                    className="mt-1 block w-32 rounded-md border-text-tertiary/20 bg-surface-hover py-2 pl-3 pr-10 text-base focus:border-primary focus:outline-none focus:ring-primary sm:text-sm text-text-primary"
                                 >
                                     <option value="en">English</option>
                                     <option value="hi">Hindi</option>
@@ -75,15 +75,15 @@ export const SettingsPage: React.FC = () => {
                 </div>
 
                 {/* Notifications */}
-                <div className="bg-white dark:bg-indigo shadow rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+                <div className="bg-surface shadow rounded-lg overflow-hidden border border-text-tertiary/10">
                     <div className="px-4 py-5 sm:p-6">
-                        <h2 className="text-lg font-medium leading-6 text-charcoal dark:text-white mb-4">Notifications</h2>
+                        <h2 className="text-lg font-medium leading-6 text-text-primary mb-4">Notifications</h2>
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 text-sm">
+                            <div className="flex items-center justify-between py-2 border-b border-text-tertiary/10 last:border-0 text-sm">
                                 <div>
-                                    <label className="font-medium text-charcoal dark:text-gray-200 block">Push Notifications</label>
-                                    <p className="text-gray-500 dark:text-gray-400">Receive notifications on your device</p>
+                                    <label className="font-medium text-text-primary block">Push Notifications</label>
+                                    <p className="text-text-secondary">Receive notifications on your device</p>
                                 </div>
                                 <input
                                     type="checkbox"
@@ -93,10 +93,10 @@ export const SettingsPage: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 text-sm">
+                            <div className="flex items-center justify-between py-2 border-b border-text-tertiary/10 last:border-0 text-sm">
                                 <div>
-                                    <label className="font-medium text-charcoal dark:text-gray-200 block">Email Updates</label>
-                                    <p className="text-gray-500 dark:text-gray-400">Receive email updates about new content</p>
+                                    <label className="font-medium text-text-primary block">Email Updates</label>
+                                    <p className="text-text-secondary">Receive email updates about new content</p>
                                 </div>
                                 <input
                                     type="checkbox"
