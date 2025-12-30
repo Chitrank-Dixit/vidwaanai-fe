@@ -8,34 +8,34 @@ export default {
     theme: {
         extend: {
             colors: {
-                // BharatGPT Dark Theme
-                background: '#0F0F0F',
+                // BharatGPT Theme (Dynamic via CSS Variables)
+                background: 'var(--color-background)',
                 surface: {
-                    DEFAULT: '#1A1A1A',
-                    hover: '#252525',
-                    active: '#2E2E2E',
+                    DEFAULT: 'var(--color-surface)',
+                    hover: 'var(--color-surface-hover)',
+                    active: 'var(--color-surface-active)',
                 },
                 text: {
-                    primary: '#F5F5F5',
-                    secondary: '#A9A9A9',
-                    tertiary: '#6B7280',
-                    inverse: '#0F0F0F',
+                    primary: 'var(--color-text-primary)',
+                    secondary: 'var(--color-text-secondary)',
+                    tertiary: 'var(--color-text-tertiary)',
+                    inverse: 'var(--color-text-inverse)',
                 },
                 primary: {
-                    DEFAULT: '#4DB8C6', // Teal accent
-                    dark: '#3A96A3',
+                    DEFAULT: 'var(--color-primary)',
+                    dark: 'var(--color-primary-dark)',
                 },
                 secondary: {
-                    DEFAULT: '#3B82F6', // Blue accent
-                    dark: '#2563EB',
+                    DEFAULT: 'var(--color-secondary)',
+                    dark: 'var(--color-secondary-dark)',
                 },
-                accent: '#60A5FA', // Light blue
+                accent: 'var(--color-accent)',
 
                 // Functional
-                success: '#10B981',
-                error: '#EF4444',
-                warning: '#F59E0B',
-                info: '#3B82F6',
+                success: 'var(--color-success)',
+                error: 'var(--color-error)',
+                warning: 'var(--color-warning)',
+                info: 'var(--color-info)',
             },
             fontFamily: {
                 sans: ['"Inter"', 'system-ui', 'sans-serif'], // Primary UI font

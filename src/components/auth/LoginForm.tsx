@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/common/Button';
-import { Input } from '@/components/common/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 

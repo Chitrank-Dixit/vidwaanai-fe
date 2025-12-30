@@ -3,15 +3,22 @@ import { Link } from 'react-router-dom';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+
 export const RegisterPage: React.FC = () => {
 
     return (
-        <div className="flex min-h-screen bg-background text-text-primary">
+        <div className="flex min-h-screen bg-background text-text-primary relative">
+            {/* Theme Toggle */}
+            <div className="absolute top-4 right-4 z-50">
+                <ThemeToggle />
+            </div>
+
             {/* Left side image/feature list (Desktop) - Swapped for register */}
             <div className="hidden lg:block relative w-0 flex-1 order-last lg:order-first">
                 <div className="absolute inset-0 shadow-lg bg-[url('https://images.unsplash.com/photo-1604881991720-f91dd269aa63?q=80&w=2560&auto=format&fit=crop')] bg-cover bg-center">
                     <div className="absolute inset-0 bg-primary/20 mix-blend-multiply" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-background/90 to-black/30 flex flex-col justify-center p-20">
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/30 flex flex-col justify-center p-20">
                         <h3 className="text-4xl font-display font-bold text-white mb-6">Join Our Community</h3>
                         <ul className="space-y-4 text-white/90 text-lg">
                             <li className="flex items-center gap-3">✨ Access exclusive teachings</li>

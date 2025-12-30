@@ -4,6 +4,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+
 export const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
@@ -15,7 +17,12 @@ export const LoginPage: React.FC = () => {
     }, [isAuthenticated, navigate]);
 
     return (
-        <div className="flex min-h-screen bg-background text-text-primary">
+        <div className="flex min-h-screen bg-background text-text-primary relative">
+            {/* Theme Toggle */}
+            <div className="absolute top-4 right-4 z-50">
+                <ThemeToggle />
+            </div>
+
             <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 w-full lg:w-1/2 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
                     <div className="text-center lg:text-left mb-10">
@@ -66,8 +73,8 @@ export const LoginPage: React.FC = () => {
             {/* Right side image/feature list (Desktop) */}
             <div className="hidden lg:block relative w-0 flex-1">
                 <div className="absolute inset-0 shadow-lg bg-[url('https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2560&auto=format&fit=crop')] bg-cover bg-center">
-                    <div className="absolute inset-0 bg-background/60 mix-blend-multiply" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent flex flex-col justify-end p-20">
+                    <div className="absolute inset-0 bg-black/60 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-20">
                         <h3 className="text-4xl font-display font-bold text-white mb-6">Explore Vedic Wisdom</h3>
                         <ul className="space-y-4 text-white/90 text-lg">
                             <li className="flex items-center gap-3">✨ AI-powered scripture guidance</li>

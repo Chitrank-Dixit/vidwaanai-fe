@@ -6,6 +6,8 @@ import { KnowledgeGraphShowcase } from '../components/HomePage/KnowledgeGraphSho
 import { SuggestedPrompts } from '../components/HomePage/SuggestedPrompts';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 
+import { ThemeToggle } from '../components/ui/ThemeToggle';
+
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
 
@@ -21,6 +23,7 @@ export const HomePage: React.FC = () => {
             <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50">
                 <div className="text-xl font-bold tracking-tight">Vidwaan AI</div>
                 <div className="flex gap-4">
+                    <ThemeToggle />
                     {/* Add language/menu later */}
                 </div>
             </header>

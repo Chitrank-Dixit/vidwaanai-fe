@@ -3,6 +3,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { UserDropdown } from './UserDropdown';
 import { Menu, Bell } from 'lucide-react';
 
+import { ThemeToggle } from '../ui/ThemeToggle';
+
 interface HeaderProps {
     onMenuToggle: () => void;
     onMobileMenuToggle: () => void;
@@ -36,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onMobileMenuToggle
             </div>
 
             <div className="flex items-center gap-4">
+                <ThemeToggle />
                 <button className="p-2 text-text-primary hover:bg-surface-hover rounded-full transition-colors relative">
                     <Bell className="h-5 w-5" />
                     <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>

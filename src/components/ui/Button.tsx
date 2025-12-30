@@ -4,7 +4,7 @@ import { motion, type HTMLMotionProps } from 'framer-motion';
 
 export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg' | 'icon';
     isLoading?: boolean;
     children?: React.ReactNode;
 }
@@ -46,6 +46,7 @@ export const Button: React.FC<ButtonProps> = ({
                     'px-3 py-1.5 text-sm': size === 'sm',
                     'px-4 py-2 text-base': size === 'md',
                     'px-6 py-3 text-lg': size === 'lg',
+                    'h-10 w-10 p-2': size === 'icon',
                 },
                 // Disabled/Loading
                 (disabled || isLoading) && 'opacity-50 cursor-not-allowed pointer-events-none',

@@ -56,101 +56,105 @@ const ProtectedRouteComponent: React.FC<ProtectedRouteProps> = ({
   return <MainLayout>{children}</MainLayout>;
 };
 
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
+
 export const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/register" element={<RegisterPage />} />
-        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/auth/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/auth/verify-email/:token" element={<EmailVerificationPage />} />
-        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+    <ThemeProvider defaultTheme="dark" storageKey="vidwaan-ui-theme">
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/auth/verify-email/:token" element={<EmailVerificationPage />} />
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRouteComponent>
-              <Dashboard />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRouteComponent>
-              <ChatInterface />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRouteComponent>
-              <ProfilePage />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRouteComponent>
-              <SettingsPage />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/scriptures"
-          element={
-            <ProtectedRouteComponent>
-              <ScripturesPage />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/meditations"
-          element={
-            <ProtectedRouteComponent>
-              <MeditationsPage />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/bookmarks"
-          element={
-            <ProtectedRouteComponent>
-              <BookmarksPage />
-            </ProtectedRouteComponent>
-          }
-        />
-        <Route
-          path="/discussions"
-          element={
-            <ProtectedRouteComponent>
-              <DiscussionsPage />
-            </ProtectedRouteComponent>
-          }
-        />
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRouteComponent>
+                <Dashboard />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRouteComponent>
+                <ChatInterface />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRouteComponent>
+                <ProfilePage />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRouteComponent>
+                <SettingsPage />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/scriptures"
+            element={
+              <ProtectedRouteComponent>
+                <ScripturesPage />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/meditations"
+            element={
+              <ProtectedRouteComponent>
+                <MeditationsPage />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/bookmarks"
+            element={
+              <ProtectedRouteComponent>
+                <BookmarksPage />
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
+            path="/discussions"
+            element={
+              <ProtectedRouteComponent>
+                <DiscussionsPage />
+              </ProtectedRouteComponent>
+            }
+          />
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRouteComponent requiredRole="admin">
-              <AdminDashboard />
-            </ProtectedRouteComponent>
-          }
-        />
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRouteComponent requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRouteComponent>
+            }
+          />
 
-        {/* Error Routes */}
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="/error" element={<ErrorPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
+          {/* Error Routes */}
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 
