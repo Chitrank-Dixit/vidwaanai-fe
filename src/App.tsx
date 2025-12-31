@@ -31,6 +31,7 @@ import { ErrorPage } from '@/pages/error/ErrorPage';
 
 // Components
 import { MainLayout } from '@/components/layout/MainLayout';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Interface for ProtectedRoute
 interface ProtectedRouteProps {
@@ -85,7 +86,9 @@ export const App: React.FC = () => {
             path="/chat"
             element={
               <ProtectedRouteComponent>
-                <ChatInterface />
+                <ErrorBoundary>
+                  <ChatInterface />
+                </ErrorBoundary>
               </ProtectedRouteComponent>
             }
           />

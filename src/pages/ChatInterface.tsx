@@ -17,7 +17,10 @@ export const ChatInterface: React.FC = () => {
     // For now, we'll assume a 'new' context or manage ID via state if utilizing the hook's creation capability
     const [conversationId, setConversationId] = useState<string | undefined>(undefined);
 
-    const { messages, sendMessage, isSending, createConversation, history } = useChat(conversationId);
+    const { messages, sendMessage, isSending, createConversation, isCreating, history } = useChat(conversationId);
+
+    // Local state for optimistic updates during new chat creation
+    const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
     // Handle initial query from homepage
     useEffect(() => {
@@ -29,12 +32,40 @@ export const ChatInterface: React.FC = () => {
     const handleSendMessage = async (text: string) => {
         try {
             let currentConvId = conversationId;
+
             if (!currentConvId) {
-                // Create new conversation on first message
-                const newConv = await createConversation(text.slice(0, 30) + "...");
-                if (newConv.success && newConv.data) {
-                    currentConvId = newConv.data.id;
-                    setConversationId(currentConvId);
+                setPendingMessage(text);
+                try {
+                    // Create new conversation on first message
+                    // The backend might return the Answer immediately here!
+                    const { response } = await createConversation({
+                        title: text.slice(0, 30) + "...",
+                        initialMessage: text
+                    });
+
+                    // Check if we got an ID (standard flow) or an Answer (immediate flow)
+                    // If the response contains an answer, we treat it as Success.
+                    // We TRY to find an ID to continue the chat.
+                    const newId = response.id || response.conversationId || response.conversation_id;
+
+                    if (newId) {
+                        currentConvId = newId;
+                        setConversationId(currentConvId);
+                    } else if (response.answer) {
+                        // Fallback to temp ID if we got an answer but no ID (stateless backend?)
+                        // This matches the key used in useChat's mutation onSuccess
+                        currentConvId = 'temp-new-id';
+                        setConversationId(currentConvId);
+                    }
+
+                    if (response.answer) {
+                        // It's already answered! We are done for this turn.
+                        return; // pendingMessage will be cleared in finally logic or implicit unmount/rerender
+                    }
+                } finally {
+                    // Start clearing it, but only if we have switched to a conversationId (where cache takes over)
+                    // Ideally, we clear sort of immediately because the result will swap in.
+                    setPendingMessage(null);
                 }
             }
 
@@ -43,6 +74,7 @@ export const ChatInterface: React.FC = () => {
             }
         } catch (error) {
             console.error("Failed to send message", error);
+            setPendingMessage(null);
         }
     };
 
@@ -99,9 +131,24 @@ export const ChatInterface: React.FC = () => {
                                 }}
                             />
                         ))}
-                        {isSending && (
+
+                        {/* Optimistic Pending User Message for New Chats */}
+                        {pendingMessage && (
+                            <ChatMessage
+                                key="pending-init"
+                                message={{
+                                    id: 'pending-init',
+                                    role: 'user',
+                                    content: pendingMessage,
+                                }}
+                            />
+                        )}
+
+                        {(isSending || isCreating) && (
                             <div className="flex justify-start animate-pulse mb-8">
-                                <div className="bg-surface-hover h-12 w-32 rounded-lg"></div>
+                                <div className="bg-surface-hover h-12 w-32 rounded-lg flex items-center justify-center">
+                                    <span className="text-text-tertiary text-sm">Thinking...</span>
+                                </div>
                             </div>
                         )}
                     </div>

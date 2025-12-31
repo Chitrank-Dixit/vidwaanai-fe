@@ -20,37 +20,60 @@ export interface Message {
     metadata?: Record<string, any>;
 }
 
-export interface ChatResponse<T> {
-    success: boolean;
-    data?: T;
-    error?: string;
+
+
+// Backend returns raw objects, so we remove the { success, data } wrapper expectation
+export type ApiResponse<T> = T;
+
+export interface ChatCompletionResponse {
+    answer: string;
+    confidence: number;
+    sources: Array<{
+        id: string;
+        title: string;
+        content: string;
+        confidence: number;
+        entity_type: string;
+        metadata: any;
+    }>;
 }
 
 export const chatAPI = {
+    // Helper to robustly extract array from various backend response shapes
+    _extractArray: (data: any, key: string): any[] => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (data[key] && Array.isArray(data[key])) return data[key];
+        if (data.data && Array.isArray(data.data)) return data.data;
+        if (data.data && data.data[key] && Array.isArray(data.data[key])) return data.data[key];
+        return [];
+    },
+
     // Get all conversations
-    getConversations: async (): Promise<ChatResponse<Conversation[]>> => {
+    getConversations: async (): Promise<Conversation[]> => {
         const response = await apiClient.get('/api/chat/conversations');
-        return response.data;
+        return chatAPI._extractArray(response.data, 'conversations');
     },
 
     // Create new conversation
     createConversation: async (
         title: string,
         description?: string
-    ): Promise<ChatResponse<Conversation>> => {
+    ): Promise<any> => {
         const response = await apiClient.post('/api/chat/conversations', {
             title,
             description,
         });
+        // Return raw data to let caller handle { id: ... } vs { answer: ... }
         return response.data;
     },
 
     // Get messages for conversation
-    getMessages: async (conversationId: string): Promise<ChatResponse<Message[]>> => {
+    getMessages: async (conversationId: string): Promise<Message[]> => {
         const response = await apiClient.get('/api/chat/messages', {
             params: { conversationId },
         });
-        return response.data;
+        return chatAPI._extractArray(response.data, 'messages');
     },
 
     // Send message
@@ -58,7 +81,7 @@ export const chatAPI = {
         conversationId: string,
         content: string,
         role: 'user' | 'assistant' = 'user'
-    ): Promise<ChatResponse<Message>> => {
+    ): Promise<ChatCompletionResponse> => {
         const response = await apiClient.post('/api/chat/messages', {
             conversationId,
             content,
@@ -68,7 +91,7 @@ export const chatAPI = {
     },
 
     // Delete conversation
-    deleteConversation: async (conversationId: string): Promise<ChatResponse<void>> => {
+    deleteConversation: async (conversationId: string): Promise<void> => {
         const response = await apiClient.delete(`/api/chat/conversations/${conversationId}`);
         return response.data;
     },
