@@ -10,14 +10,24 @@ import { useAuth } from '../hooks/useAuth';
 
 
 
+import { useNavigate, useParams } from 'react-router-dom';
+
 export const ChatInterface: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const { conversationId: paramId } = useParams();
+
+    // Prioritize URL param, fallback to undefined (new chat)
+    const conversationId = paramId === 'undefined' ? undefined : paramId;
     const initialQuery = searchParams.get('q');
 
-    // We would manage conversation ID here, potentially creating a new one if needed
-    // For now, we'll assume a 'new' context or manage ID via state if utilizing the hook's creation capability
-    const [conversationId, setConversationId] = useState<string | undefined>(undefined);
+    // Redirect if URL is literally /chat/undefined
+    useEffect(() => {
+        if (paramId === 'undefined') {
+            navigate('/chat', { replace: true });
+        }
+    }, [paramId, navigate]);
 
     const { messages, sendMessage, isSending, createConversation, isCreating, history } = useChat(conversationId);
 
@@ -33,46 +43,36 @@ export const ChatInterface: React.FC = () => {
 
     const handleSendMessage = async (text: string) => {
         try {
-            let currentConvId = conversationId;
-
-            if (!currentConvId) {
-                setPendingMessage(text);
-                try {
-                    // Create new conversation on first message
-                    // The backend might return the Answer immediately here!
-                    const { response } = await createConversation({
-                        title: text.slice(0, 30) + "...",
-                        initialMessage: text
-                    });
-
-                    // Check if we got an ID (standard flow) or an Answer (immediate flow)
-                    // If the response contains an answer, we treat it as Success.
-                    // We TRY to find an ID to continue the chat.
-                    const newId = response.id || response.conversationId || response.conversation_id;
-
-                    if (newId) {
-                        currentConvId = newId;
-                        setConversationId(currentConvId);
-                    } else if (response.answer) {
-                        // Fallback to temp ID if we got an answer but no ID (stateless backend?)
-                        // This matches the key used in useChat's mutation onSuccess
-                        currentConvId = 'temp-new-id';
-                        setConversationId(currentConvId);
-                    }
-
-                    if (response.answer) {
-                        // It's already answered! We are done for this turn.
-                        return; // pendingMessage will be cleared in finally logic or implicit unmount/rerender
-                    }
-                } finally {
-                    // Start clearing it, but only if we have switched to a conversationId (where cache takes over)
-                    // Ideally, we clear sort of immediately because the result will swap in.
-                    setPendingMessage(null);
-                }
+            // If we already have an ID (from URL), use it
+            if (conversationId) {
+                await sendMessage({ content: text, role: 'user' });
+                return;
             }
 
-            if (currentConvId) {
-                await sendMessage({ content: text, role: 'user' });
+            // Otherwise, we are creating a NEW conversation
+            setPendingMessage(text);
+            try {
+                const { response } = await createConversation({
+                    title: text.slice(0, 30) + "...",
+                    initialMessage: text
+                });
+
+                // Ideally we get an ID
+                const newId = response.id || response.conversationId || response.conversation_id;
+
+                if (newId) {
+                    // Navigate to the new URL!
+                    navigate(`/chat/${newId}`);
+                } else if (response.answer) {
+                    // If backend didn't give ID but gave answer, we might be stuck.
+                    // For now, let's just stay here (maybe reload history?)
+                    // But typically we should get an ID. 
+                    // If we use 'temp-new-id', it won't persist on reload.
+                    // Let's force a history refresh or similar if possible.
+                }
+
+            } finally {
+                setPendingMessage(null);
             }
         } catch (error) {
             console.error("Failed to send message", error);
@@ -93,10 +93,9 @@ export const ChatInterface: React.FC = () => {
                 conversations={history}
                 currentId={conversationId}
                 onSelect={(id) => {
-                    console.log('[UI] Sidebar selected ID:', id);
-                    setConversationId(id);
+                    navigate(`/chat/${id}`);
                 }}
-                onNewChat={() => setConversationId(undefined)}
+                onNewChat={() => navigate('/chat')}
             />
 
             {/* Main Content */}

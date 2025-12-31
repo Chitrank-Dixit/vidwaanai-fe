@@ -52,8 +52,20 @@ export const chatAPI = {
     // Get all conversations
     getConversations: async (): Promise<Conversation[]> => {
         const response = await apiClient.get('/api/chat/conversations');
-        return chatAPI._extractArray(response.data, 'conversations');
-    },
+        const items = chatAPI._extractArray(response.data, 'conversations');
+
+        // Normalize items to ensure 'id' exists
+        return items.map((item: any) => ({
+            ...item,
+            id: item.id || item.conversation_id || item._id,
+        }));
+    }, // Add comma here if needed by context, but typically replace_file_content replaces block. 
+    // Check StartLine/EndLine carefully.
+    // The original code was: 
+    // getConversations: async (): Promise<Conversation[]> => {
+    //     const response = await apiClient.get('/api/chat/conversations');
+    //     return chatAPI._extractArray(response.data, 'conversations');
+    // },
 
     // Create new conversation
     createConversation: async (
@@ -82,7 +94,13 @@ export const chatAPI = {
         console.log('[API] getMessages raw response:', response);
         const result = chatAPI._extractArray(response.data, 'messages');
         console.log('[API] getMessages extracted result:', result);
-        return result;
+
+        // Normalize messages to match frontend interface
+        return result.map((msg: any) => ({
+            ...msg,
+            id: msg.id || msg._id,
+            content: msg.content || msg.text,
+        }));
     },
 
     // Send message

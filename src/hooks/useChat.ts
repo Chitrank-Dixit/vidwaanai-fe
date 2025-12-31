@@ -8,7 +8,7 @@ export const useChat = (conversationId?: string) => {
     const messagesQuery = useQuery({
         queryKey: ['chatMessages', conversationId],
         queryFn: () => chatAPI.getMessages(conversationId!),
-        enabled: !!conversationId && !conversationId.startsWith('temp-'),
+        enabled: !!conversationId && conversationId !== 'undefined' && !conversationId.startsWith('temp-'),
         select: (data) => data || [],
     });
 

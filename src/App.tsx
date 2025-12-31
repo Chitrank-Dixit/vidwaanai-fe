@@ -95,6 +95,16 @@ export const App: React.FC = () => {
             }
           />
           <Route
+            path="/chat/:conversationId"
+            element={
+              <ProtectedRouteComponent layout={false}>
+                <ErrorBoundary>
+                  <ChatInterface />
+                </ErrorBoundary>
+              </ProtectedRouteComponent>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <ProtectedRouteComponent>
