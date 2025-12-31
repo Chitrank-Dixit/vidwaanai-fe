@@ -37,11 +37,13 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
+  layout?: boolean;
 }
 
 const ProtectedRouteComponent: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
+  layout = true,
 }) => {
   const { isAuthenticated, user } = useAuth(); // assuming user has role
 
@@ -54,7 +56,7 @@ const ProtectedRouteComponent: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/unauthorized" replace />;
   }
 
-  return <MainLayout>{children}</MainLayout>;
+  return layout ? <MainLayout>{children}</MainLayout> : <>{children}</>;
 };
 
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
@@ -85,7 +87,7 @@ export const App: React.FC = () => {
           <Route
             path="/chat"
             element={
-              <ProtectedRouteComponent>
+              <ProtectedRouteComponent layout={false}>
                 <ErrorBoundary>
                   <ChatInterface />
                 </ErrorBoundary>

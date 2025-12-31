@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Settings, Database } from 'lucide-react';
+import { Menu, Database } from 'lucide-react';
 import { ChatSidebar } from '../components/chat/ChatSidebar';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessage } from '../components/chat/ChatMessage';
 import { useChat } from '../hooks/useChat';
+import { UserDropdown } from '../components/layout/UserDropdown';
+import { useAuth } from '../hooks/useAuth';
 
 
 
@@ -90,7 +92,10 @@ export const ChatInterface: React.FC = () => {
                 onClose={() => setSidebarOpen(false)}
                 conversations={history}
                 currentId={conversationId}
-                onSelect={(id) => setConversationId(id)}
+                onSelect={(id) => {
+                    console.log('[UI] Sidebar selected ID:', id);
+                    setConversationId(id);
+                }}
                 onNewChat={() => setConversationId(undefined)}
             />
 
@@ -112,9 +117,7 @@ export const ChatInterface: React.FC = () => {
                         <button className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary">
                             <Database className="w-5 h-5" />
                         </button>
-                        <button className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary">
-                            <Settings className="w-5 h-5" />
-                        </button>
+                        <UserDropdown user={useAuth().user} />
                     </div>
                 </header>
 

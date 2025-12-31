@@ -10,7 +10,7 @@ interface HeaderProps {
     onMobileMenuToggle: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onMobileMenuToggle }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuToggle: _onMenuToggle, onMobileMenuToggle }) => {
     const { user } = useAuth();
 
     return (
@@ -24,13 +24,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onMobileMenuToggle
                     <Menu className="h-6 w-6" />
                 </button>
 
-                {/* Desktop Collapse Toggle (Optional, can hide if sidebar is persistent) */}
-                <button
-                    className="hidden lg:block p-2 text-text-primary hover:bg-surface-hover rounded-md"
-                    onClick={onMenuToggle}
-                >
-                    <Menu className="h-5 w-5" />
-                </button>
+                {/* Desktop Collapse Toggle (Removed) */}
 
                 <div className="flex items-center gap-2">
                     <span className="text-xl font-display font-bold text-primary">🕉️ Vidwaan</span>

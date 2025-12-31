@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '../ui/Button';
 import type { Conversation } from '../../api/chat';
 
@@ -44,79 +44,60 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         transition={{ type: 'spring', damping: 20, stiffness: 100 }}
                         className={clsx(
                             'fixed md:static inset-y-0 left-0 z-50',
-                            'w-72 bg-surface border-r border-text-tertiary/10',
-                            'flex flex-col',
+                            'w-[260px] bg-[#171717] text-gray-200 flex flex-col',
+                            'border-r border-white/10', // Subtle border
                             className
                         )}
                     >
                         {/* Header */}
-                        <div className="p-4 border-b border-text-tertiary/10 flex items-center justify-between">
-                            <span className="font-semibold text-text-primary flex items-center gap-2">
-                                <MessageSquare className="w-5 h-5 text-primary" />
-                                History
-                            </span>
-                            <button
-                                onClick={onClose}
-                                className="md:hidden p-1 hover:bg-surface-hover rounded-md text-text-secondary"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        {/* New Chat Button */}
-                        <div className="p-4">
+                        <div className="p-3 mb-2">
                             <Button
                                 variant="outline"
-                                className="w-full justify-start gap-2 border-dashed border-text-tertiary/30"
+                                className="w-full justify-start gap-2 border-white/20 hover:bg-white/10 text-white bg-transparent transition-colors"
                                 onClick={onNewChat}
                             >
-                                <Plus className="w-4 h-4" />
-                                New Conversation
+                                <span className="flex-1 text-left text-sm">New chat</span>
+                                <Plus className="w-4 h-4 text-gray-400" />
                             </Button>
                         </div>
 
                         {/* Scrollable list */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                            <div className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">
+                        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                            <div className="text-xs font-semibold text-gray-500 px-2 pt-2 pb-1">
                                 Recent
                             </div>
 
-                            {/* Mock items */}
                             {/* Recent Conversations */}
                             {conversations.length === 0 ? (
-                                <div className="text-sm text-text-tertiary px-2 italic">No conversations yet</div>
+                                <div className="text-sm text-gray-500 px-2 italic">No conversations yet</div>
                             ) : (
                                 conversations.map((conv) => (
                                     <button
                                         key={conv.id}
                                         onClick={() => onSelect(conv.id)}
                                         className={clsx(
-                                            "w-full text-left p-3 rounded-lg transition-colors group",
-                                            currentId === conv.id ? "bg-surface-active" : "hover:bg-surface-hover"
+                                            "w-full text-left px-3 py-2 rounded-lg transition-colors group relative overflow-hidden",
+                                            currentId === conv.id
+                                                ? "bg-white/10 text-white"
+                                                : "text-gray-300 hover:bg-white/5"
                                         )}
                                     >
-                                        <div className={clsx(
-                                            "text-sm font-medium truncate transition-colors",
-                                            currentId === conv.id ? "text-primary" : "text-text-primary group-hover:text-primary"
-                                        )}>
-                                            {conv.title}
-                                        </div>
-                                        <div className="text-xs text-text-tertiary mt-1 flex justify-between">
-                                            <span>{new Date(conv.updatedAt).toLocaleDateString()}</span>
-                                            <span>{conv.messageCount} msgs</span>
+                                        <div className="text-sm font-medium truncate relative z-10">
+                                            {conv.title || 'New Chat'}
                                         </div>
                                     </button>
                                 ))
                             )}
                         </div>
 
-                        {/* Footer / User Profile placeholder */}
-                        <div className="p-4 border-t border-text-tertiary/10">
-                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer">
-                                <div className="w-8 h-8 rounded-full bg-primary/20" />
+                        {/* Footer */}
+                        <div className="p-3 border-t border-white/10 mt-auto">
+                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors text-sm text-gray-200">
+                                <div className="w-8 h-8 rounded-full bg-green-700 flex items-center justify-center text-white text-xs font-bold">
+                                    CD
+                                </div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium text-text-primary truncate">User Name</div>
-                                    <div className="text-xs text-text-secondary">Free Plan</div>
+                                    <div className="truncate font-medium">Chitrank Dixit</div>
                                 </div>
                             </div>
                         </div>

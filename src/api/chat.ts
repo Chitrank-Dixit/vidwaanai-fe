@@ -70,10 +70,19 @@ export const chatAPI = {
 
     // Get messages for conversation
     getMessages: async (conversationId: string): Promise<Message[]> => {
+        console.log('[API] getMessages called for:', conversationId);
+        // Try passing both camelCase and snake_case to be safe, or just snake_case if that's the backend convention.
+        // Based on other endpoints, snake_case is likely.
         const response = await apiClient.get('/api/chat/messages', {
-            params: { conversationId },
+            params: {
+                conversationId,
+                conversation_id: conversationId
+            },
         });
-        return chatAPI._extractArray(response.data, 'messages');
+        console.log('[API] getMessages raw response:', response);
+        const result = chatAPI._extractArray(response.data, 'messages');
+        console.log('[API] getMessages extracted result:', result);
+        return result;
     },
 
     // Send message
