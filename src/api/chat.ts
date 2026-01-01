@@ -111,10 +111,14 @@ export const chatAPI = {
     ): Promise<ChatCompletionResponse> => {
         const response = await apiClient.post('/api/chat/messages', {
             conversationId,
-            content,
+            text: content, // Backend expects 'text'
             role,
         });
-        return response.data;
+        const data = response.data;
+        return {
+            ...data,
+            answer: data.answer || data.text || data.content || data.response || '',
+        };
     },
 
     // Delete conversation
