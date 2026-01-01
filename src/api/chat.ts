@@ -115,9 +115,34 @@ export const chatAPI = {
             role,
         });
         const data = response.data;
+        console.log('[API] sendMessage response:', data);
+
+        let answer = '';
+
+        // Handle if response is array (e.g. [UserMsg, AIMsg])
+        if (Array.isArray(data)) {
+            const aiMsg = data.find(m => m.role === 'assistant');
+            if (aiMsg) {
+                answer = aiMsg.content || aiMsg.text || aiMsg.answer || '';
+            }
+        }
+        // Handle single object
+        else if (data) {
+            // Prioritize explicit 'answer' field
+            if (data.answer) {
+                answer = data.answer;
+            }
+            // If implicit text/content, ONLY use it if it is NOT from the user
+            else if (data.role !== 'user') {
+                answer = data.text || data.content || data.response || '';
+            }
+            // If the backend returns the *User* message but has the answer in a separate field?
+            // (Covered by data.answer check above)
+        }
+
         return {
             ...data,
-            answer: data.answer || data.text || data.content || data.response || '',
+            answer,
         };
     },
 
