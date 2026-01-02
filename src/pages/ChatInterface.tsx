@@ -33,7 +33,14 @@ export const ChatInterface: React.FC = () => {
         }
     }, [pathParam, navigate]);
 
-    const { messages, createConversation, isCreating, history } = useChat(conversationId);
+    const {
+        messages,
+        createConversation,
+        isCreating,
+        history,
+        streamMessage,
+        isStreaming
+    } = useChat(conversationId);
 
     // Local state for optimistic updates during new chat creation
     const [pendingMessage, setPendingMessage] = useState<string | null>(null);
@@ -51,44 +58,8 @@ export const ChatInterface: React.FC = () => {
         try {
             // Case 1: Existing Conversation
             if (conversationId) {
-                const now = new Date().toISOString();
-
-                // Optimistic User Message
-                queryClient.setQueryData(['chatMessages', conversationId], (old: any[] = []) => [
-                    ...old,
-                    {
-                        id: `temp-user-${Date.now()}`,
-                        conversationId,
-                        content: text,
-                        role: 'user',
-                        createdAt: now
-                    }
-                ]);
-
-                try {
-                    const completion = await chatAPI.sendMessage(conversationId, text, 'user');
-
-                    // Update with AI response
-                    queryClient.setQueryData(['chatMessages', conversationId], (old: any[] = []) => {
-                        // Remove temp user message if needed, or just append AI
-                        // We keep the optimistic one or replace it if we had a real ID
-                        return [
-                            ...old,
-                            {
-                                id: completion.id || `ai-${Date.now()}`,
-                                conversationId,
-                                content: completion.answer,
-                                role: 'assistant',
-                                createdAt: new Date().toISOString(),
-                                sources: completion.sources?.map((s: any) => ({ title: s.title, ref: s.id })),
-                                metadata: { confidence: completion.confidence }
-                            }
-                        ];
-                    });
-                } catch (err) {
-                    console.error("Failed to send message", err);
-                    // Could show error toast or revert optimistic update here
-                }
+                // Use streaming method
+                await streamMessage(text);
                 return;
             }
 
@@ -134,25 +105,20 @@ export const ChatInterface: React.FC = () => {
                     // 2. NAVIGATE IMMEDIATELY
                     navigate(`/chat/${newId}`);
 
-                    try {
-                        // 3. SEND MESSAGE (Background)
-                        const completion = await chatAPI.sendMessage(newId, text, 'user');
-
-                        // 4. UPDATE CACHE WITH AI RESPONSE
+                    // 3. UPDATE CACHE WITH AI RESPONSE (from Creation Response)
+                    if (responseData.answer || responseData.content) {
                         queryClient.setQueryData(['chatMessages', newId], (old: any[] = []) => [
                             ...old,
                             {
-                                id: completion.id || `init-ai-${Date.now()}`,
+                                id: responseData.messageId || `init-ai-${Date.now()}`,
                                 conversationId: newId,
-                                content: completion.answer,
+                                content: responseData.answer || responseData.content,
                                 role: 'assistant',
                                 createdAt: new Date().toISOString(),
-                                sources: completion.sources?.map((s: any) => ({ title: s.title, ref: s.id })),
-                                metadata: { confidence: completion.confidence }
+                                sources: responseData.sources,
+                                metadata: { confidence: responseData.confidence }
                             }
                         ]);
-                    } catch (sendErr) {
-                        console.error("Failed to send follow-up message", sendErr);
                     }
                 } else {
                     console.error("Critical: Initial conversation ID is missing or invalid", response);
@@ -218,7 +184,8 @@ export const ChatInterface: React.FC = () => {
                                 key={msg.id}
                                 message={{
                                     ...msg,
-                                    onEntityClick: handleEntityClick
+                                    onEntityClick: handleEntityClick,
+                                    isStreaming: msg.isStreaming
                                 }}
                             />
                         ))}

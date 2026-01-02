@@ -1,17 +1,105 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { chatAPI, type Message } from '../api/chat';
 
 export const useChat = (conversationId?: string) => {
     const queryClient = useQueryClient();
+    const [isStreaming, setIsStreaming] = useState(false);
 
     // Fetch messages for active conversation
     const messagesQuery = useQuery({
         queryKey: ['chatMessages', conversationId],
         queryFn: () => chatAPI.getMessages(conversationId!),
         enabled: !!conversationId && conversationId !== 'undefined' && !conversationId.startsWith('temp-'),
-        staleTime: 60000, // 1 minute: Trust the cache (and our manual updates) to prevent flickering/overwriting
+        staleTime: 60000,
         select: (data) => data || [],
     });
+
+    const streamMessage = async (content: string) => {
+        if (!conversationId) return;
+
+        setIsStreaming(true);
+
+        // 1. Optimistic User Update
+        const now = new Date().toISOString();
+        queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => [
+            ...old,
+            {
+                id: `temp-user-${Date.now()}`,
+                conversationId,
+                content,
+                role: 'user',
+                createdAt: now,
+            },
+            {
+                id: `ai-streaming-${Date.now()}`,
+                conversationId,
+                content: '', // Start empty
+                role: 'assistant',
+                createdAt: now,
+                isStreaming: true
+            }
+        ]);
+
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+            const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': accessToken ? `Bearer ${accessToken}` : '',
+                },
+                body: JSON.stringify({ conversationId, question: content })
+            });
+
+            if (!response.ok) throw new Error(response.statusText);
+            if (!response.body) throw new Error('No response body');
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let aiContent = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const dataStr = line.slice(6);
+                        if (dataStr === '[DONE]') continue;
+                        try {
+                            const data = JSON.parse(dataStr);
+                            if (data.token) {
+                                aiContent += data.token;
+
+                                // Update Cache
+                                queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                                    const newMessages = [...old];
+                                    const lastMsg = newMessages[newMessages.length - 1];
+                                    if (lastMsg && lastMsg.role === 'assistant') {
+                                        lastMsg.content = aiContent;
+                                    }
+                                    return newMessages;
+                                });
+                            }
+                        } catch (e) {
+                            // ignore
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Streaming failed", error);
+        } finally {
+            setIsStreaming(false);
+            queryClient.invalidateQueries({ queryKey: ['chatMessages', conversationId] });
+        }
+    };
 
     // Send message mutation
     const sendMessageMutation = useMutation({
@@ -169,6 +257,10 @@ export const useChat = (conversationId?: string) => {
 
         sendMessage: sendMessageMutation.mutateAsync,
         isSending: sendMessageMutation.isPending,
+
+        // STREAMING
+        streamMessage,
+        isStreaming,
 
         createConversation: createConversationMutation.mutateAsync,
         isCreating: createConversationMutation.isPending,
