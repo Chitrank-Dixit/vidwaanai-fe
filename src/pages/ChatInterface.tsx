@@ -4,6 +4,7 @@ import { Menu, Database } from 'lucide-react';
 import { ChatSidebar } from '../components/chat/ChatSidebar';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessage } from '../components/chat/ChatMessage';
+import { TypingIndicator } from '../components/chat/TypingIndicator';
 import { useChat } from '../hooks/useChat';
 import { UserDropdown } from '../components/layout/UserDropdown';
 import { useAuth } from '../hooks/useAuth';
@@ -11,7 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { chatAPI } from '../api/chat';
+
 import { useQueryClient } from '@tanstack/react-query';
 
 export const ChatInterface: React.FC = () => {
@@ -38,8 +39,7 @@ export const ChatInterface: React.FC = () => {
         createConversation,
         isCreating,
         history,
-        streamMessage,
-        isStreaming
+        streamMessage
     } = useChat(conversationId);
 
     // Local state for optimistic updates during new chat creation
@@ -60,6 +60,7 @@ export const ChatInterface: React.FC = () => {
             if (conversationId) {
                 // Use streaming method
                 await streamMessage(text);
+                setIsSubmitting(false);
                 return;
             }
 
@@ -179,16 +180,21 @@ export const ChatInterface: React.FC = () => {
                 <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth">
                     <div className="max-w-3xl mx-auto w-full pb-32">
                         {/* Messages mapped from hook */}
-                        {messages.map((msg: any) => (
-                            <ChatMessage
-                                key={msg.id}
-                                message={{
-                                    ...msg,
-                                    onEntityClick: handleEntityClick,
-                                    isStreaming: msg.isStreaming
-                                }}
-                            />
-                        ))}
+                        {messages.map((msg: any) => {
+                            if (msg.role === 'assistant' && msg.isStreaming && !msg.content) {
+                                return <TypingIndicator key={msg.id} />;
+                            }
+                            return (
+                                <ChatMessage
+                                    key={msg.id}
+                                    message={{
+                                        ...msg,
+                                        onEntityClick: handleEntityClick,
+                                        isStreaming: msg.isStreaming
+                                    }}
+                                />
+                            );
+                        })}
 
                         {/* Optimistic Pending User Message for New Chats */}
                         {pendingMessage && (

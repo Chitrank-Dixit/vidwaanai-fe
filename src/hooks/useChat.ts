@@ -94,9 +94,45 @@ export const useChat = (conversationId?: string) => {
                 }
             }
         } catch (error) {
-            console.error("Streaming failed", error);
+            console.warn("Streaming failed, falling back to standard send", error);
+            try {
+                // Fallback: Use standard REST API
+                const completion = await chatAPI.sendMessage(conversationId, content, 'user');
+
+                // Update Cache: Replace the empty streaming message with the full response
+                queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                    // Normalize sources
+                    const sources = completion.sources?.map((s: any) => ({
+                        title: s.title,
+                        ref: s.id
+                    }));
+
+                    return old.map(m => {
+                        // Find our specific placeholder using the timestamp if possible, 
+                        // or just the last assistant message that is streaming.
+                        if (m.isStreaming) {
+                            return {
+                                ...m,
+                                id: completion.id || m.id,
+                                content: completion.answer,
+                                isStreaming: false,
+                                sources: sources,
+                                metadata: { confidence: completion.confidence }
+                            };
+                        }
+                        return m;
+                    });
+                });
+            } catch (fallbackError) {
+                console.error("Fallback failed", fallbackError);
+            }
         } finally {
             setIsStreaming(false);
+            // Invalidate to ensure consistency, but delay slightly or trust the update?
+            // If we invalidate immediately, we might see a flash. 
+            // The optimistic update above should be enough. 
+            // We can invalidate strictly if fallback failed.
+            // But let's invalidate to be safe, syncing with server state.
             queryClient.invalidateQueries({ queryKey: ['chatMessages', conversationId] });
         }
     };

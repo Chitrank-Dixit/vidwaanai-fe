@@ -18,6 +18,7 @@ export interface Message {
     entities?: Array<{ name: string; type: string }>;
     sources?: Array<{ title: string; ref: string }>;
     metadata?: Record<string, any>;
+    isStreaming?: boolean;
 }
 
 
@@ -83,17 +84,17 @@ export const chatAPI = {
         return response.data;
     },
 
-    // Get messages for conversation
-    getMessages: async (conversationId: string): Promise<Message[]> => {
-        console.log('[API] getMessages called for:', conversationId);
-        // Try passing both camelCase and snake_case to be safe, or just snake_case if that's the backend convention.
-        // Based on other endpoints, snake_case is likely.
-        const response = await apiClient.get('/api/chat/messages', {
-            params: {
-                conversationId,
-                conversation_id: conversationId
-            },
-        });
+    // Get messages for conversation (or thread)
+    getMessages: async (conversationId: string, messageId?: string): Promise<Message[]> => {
+        console.log('[API] getMessages called for:', conversationId, 'Thread:', messageId);
+        const params: any = {
+            conversationId,
+        };
+        if (messageId) {
+            params.messageId = messageId;
+        }
+
+        const response = await apiClient.get('/api/chat/messages', { params });
         console.log('[API] getMessages raw response:', response);
         const result = chatAPI._extractArray(response.data, 'messages');
         console.log('[API] getMessages extracted result:', result);
@@ -117,8 +118,16 @@ export const chatAPI = {
             text: content, // Backend expects 'text'
             role,
         });
-        const data = response.data;
-        console.log('[API] sendMessage response:', data);
+        let data = response.data;
+        console.log('[API] sendMessage raw response:', data);
+
+        // Unwrap standard { success, data } envelope if needed
+        // If the top-level object has 'data' property and NO 'answer'/'role' properties, it's likely a wrapper.
+        // Also check if it's NOT an array (arrays are usually the list of messages).
+        if (data && data.data && !data.answer && !data.role && !Array.isArray(data)) {
+            console.log('[API] Unwrapping data property');
+            data = data.data;
+        }
 
         let answer = '';
 
