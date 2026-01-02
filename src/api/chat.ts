@@ -26,6 +26,7 @@ export interface Message {
 export type ApiResponse<T> = T;
 
 export interface ChatCompletionResponse {
+    id?: string;
     answer: string;
     confidence: number;
     sources: Array<{
@@ -55,10 +56,12 @@ export const chatAPI = {
         const items = chatAPI._extractArray(response.data, 'conversations');
 
         // Normalize items to ensure 'id' exists
-        return items.map((item: any) => ({
-            ...item,
-            id: item.id || item.conversation_id || item._id,
-        }));
+        return items
+            .map((item: any) => ({
+                ...item,
+                id: item.id || item.conversation_id || item._id,
+            }))
+            .filter((item) => item.id); // STRICTLY filter out items with no ID to prevent /chat/undefined redirects
     }, // Add comma here if needed by context, but typically replace_file_content replaces block. 
     // Check StartLine/EndLine carefully.
     // The original code was: 

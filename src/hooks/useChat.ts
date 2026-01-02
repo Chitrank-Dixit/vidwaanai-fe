@@ -9,6 +9,7 @@ export const useChat = (conversationId?: string) => {
         queryKey: ['chatMessages', conversationId],
         queryFn: () => chatAPI.getMessages(conversationId!),
         enabled: !!conversationId && conversationId !== 'undefined' && !conversationId.startsWith('temp-'),
+        staleTime: 60000, // 1 minute: Trust the cache (and our manual updates) to prevent flickering/overwriting
         select: (data) => data || [],
     });
 
@@ -47,19 +48,26 @@ export const useChat = (conversationId?: string) => {
             queryClient.setQueryData(['chatMessages', conversationId], context?.previousMessages);
         },
         onSuccess: ({ apiResponse }) => {
+            // Do NOT invalidate immediately. Trust the API response.
+            // Race condition: Server might not have persisted the AI message yet.
+            // queryClient.invalidateQueries({ queryKey: ['chatMessages', conversationId] });
+
+            console.log('[useChat] sendMessage SUCCESS. API Response:', apiResponse);
+
             queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
                 const now = new Date().toISOString();
+                console.log('[useChat] Updating cache. Old messages:', old.length);
 
                 // 2. Create Assistant Message from API Response
                 // Note: The User message was already added in onMutate.
                 // We just append the AI response here.
                 const assistantMessage: Message = {
-                    id: `temp-ai-${Date.now()}`,
+                    id: apiResponse.id || `temp-ai-${Date.now()}`,
                     conversationId: conversationId!,
                     content: apiResponse.answer,
                     role: 'assistant',
                     createdAt: now,
-                    sources: apiResponse.sources?.map(s => ({
+                    sources: apiResponse.sources?.map((s: any) => ({
                         title: s.title,
                         ref: s.id
                     })),
@@ -67,6 +75,12 @@ export const useChat = (conversationId?: string) => {
                         confidence: apiResponse.confidence
                     }
                 };
+
+                // Deduplicate: Check if this message ID already exists (from the refetch?)
+                // Actually, if we invalidate, the refetch might happen concurrently.
+                // Optimistic update + Invalidate is the safest pattern.
+                // But we still append here to ensure immediate feedback if refetch is slow.
+                if (old.some(m => m.id === assistantMessage.id)) return old;
 
                 return [...old, assistantMessage];
             });
@@ -78,14 +92,31 @@ export const useChat = (conversationId?: string) => {
         mutationFn: ({ title, initialMessage }: { title: string; initialMessage?: string }) =>
             chatAPI.createConversation(title).then(response => ({ response, initialMessage })),
         onSuccess: ({ response, initialMessage }) => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+            // STOP THE REDIRECT LOOP: Do NOT invalidate 'conversations' immediately.
+            // Invalidating triggers a refetch which might be causing the layout/sidebar to remount or router to reset.
+            // queryClient.invalidateQueries({ queryKey: ['conversations'] });
+
+            // INSTEAD: Manually update the conversation list cache (Optimistic-like)
+            const newId = response.id || response.conversationId || response.session_id || response._id;
+            if (newId) {
+                queryClient.setQueryData(['conversations'], (old: any[] = []) => {
+                    const newConv = {
+                        id: newId,
+                        title: (initialMessage || 'New Chat').slice(0, 30),
+                        updatedAt: new Date().toISOString(),
+                        createdAt: new Date().toISOString(),
+                        messageCount: 2, // Initial user message + AI response
+                    };
+                    // Prepend the new conversation
+                    return [newConv, ...old];
+                });
+            }
 
             // If the creation response includes an Answer, add it to the message list!
             if (response && response.answer) {
                 const now = new Date().toISOString();
 
                 // We suspect the ID might be missing, but if we have it on data:
-                const newId = response.id || response.conversationId;
                 const targetId = newId || 'temp-new-id';
 
                 // Add to cache

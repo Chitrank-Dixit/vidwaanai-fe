@@ -68,10 +68,10 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                             </div>
 
                             {/* Recent Conversations */}
-                            {conversations.length === 0 ? (
+                            {conversations.filter(c => c.id).length === 0 ? (
                                 <div className="text-sm text-gray-500 px-2 italic">No conversations yet</div>
                             ) : (
-                                conversations.map((conv) => (
+                                conversations.filter(c => c.id).map((conv) => (
                                     <button
                                         key={conv.id}
                                         onClick={() => onSelect(conv.id)}

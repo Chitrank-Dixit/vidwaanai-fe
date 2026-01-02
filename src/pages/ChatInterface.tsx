@@ -11,28 +11,33 @@ import { useAuth } from '../hooks/useAuth';
 
 
 import { useNavigate, useParams } from 'react-router-dom';
+import { chatAPI } from '../api/chat';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const ChatInterface: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { conversationId: paramId } = useParams();
+    const { "*": pathParam } = useParams();
+    const queryClient = useQueryClient();
 
     // Prioritize URL param, fallback to undefined (new chat)
-    const conversationId = paramId === 'undefined' ? undefined : paramId;
+    // Handle edge case where ID might be literally "undefined" string
+    const conversationId = (!pathParam || pathParam === 'undefined') ? undefined : pathParam;
     const initialQuery = searchParams.get('q');
 
-    // Redirect if URL is literally /chat/undefined
+    // Redirect if URL is literally /chat/undefined (cleanup)
     useEffect(() => {
-        if (paramId === 'undefined') {
+        if (pathParam === 'undefined') {
             navigate('/chat', { replace: true });
         }
-    }, [paramId, navigate]);
+    }, [pathParam, navigate]);
 
-    const { messages, sendMessage, isSending, createConversation, isCreating, history } = useChat(conversationId);
+    const { messages, createConversation, isCreating, history } = useChat(conversationId);
 
     // Local state for optimistic updates during new chat creation
     const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Handle initial query from homepage
     useEffect(() => {
@@ -42,41 +47,125 @@ export const ChatInterface: React.FC = () => {
     }, [initialQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSendMessage = async (text: string) => {
+        setIsSubmitting(true);
         try {
-            // If we already have an ID (from URL), use it
+            // Case 1: Existing Conversation
             if (conversationId) {
-                await sendMessage({ content: text, role: 'user' });
+                const now = new Date().toISOString();
+
+                // Optimistic User Message
+                queryClient.setQueryData(['chatMessages', conversationId], (old: any[] = []) => [
+                    ...old,
+                    {
+                        id: `temp-user-${Date.now()}`,
+                        conversationId,
+                        content: text,
+                        role: 'user',
+                        createdAt: now
+                    }
+                ]);
+
+                try {
+                    const completion = await chatAPI.sendMessage(conversationId, text, 'user');
+
+                    // Update with AI response
+                    queryClient.setQueryData(['chatMessages', conversationId], (old: any[] = []) => {
+                        // Remove temp user message if needed, or just append AI
+                        // We keep the optimistic one or replace it if we had a real ID
+                        return [
+                            ...old,
+                            {
+                                id: completion.id || `ai-${Date.now()}`,
+                                conversationId,
+                                content: completion.answer,
+                                role: 'assistant',
+                                createdAt: new Date().toISOString(),
+                                sources: completion.sources?.map((s: any) => ({ title: s.title, ref: s.id })),
+                                metadata: { confidence: completion.confidence }
+                            }
+                        ];
+                    });
+                } catch (err) {
+                    console.error("Failed to send message", err);
+                    // Could show error toast or revert optimistic update here
+                }
                 return;
             }
 
-            // Otherwise, we are creating a NEW conversation
+            // Case 2: New Conversation
             setPendingMessage(text);
             try {
+                // 1. Create the conversation
                 const { response } = await createConversation({
                     title: text.slice(0, 30) + "...",
                     initialMessage: text
                 });
 
-                // Ideally we get an ID
-                const newId = response.id || response.conversationId || response.conversation_id;
+                const responseData = response.response || response;
+                // INSTRUMENTATION: Expose response to browser agent for verification
+                (window as any).DEBUG_LAST_ChatResponse = response;
+                console.log('[DEBUG] createConversation Raw Response:', response);
 
-                if (newId) {
-                    // Navigate to the new URL!
+                // ROBUST EXTRACTION: Check all possible paths for ID
+                const newId =
+                    // Direct top-level
+                    response.id || response._id || response.conversationId || response.conversation_id || response.session_id ||
+                    // Nested in .data (common Axios/API pattern)
+                    response.data?.id || response.data?._id || response.data?.conversationId ||
+                    // Nested in .conversation (some backends wrap it)
+                    response.conversation?.id || response.conversation?._id ||
+                    // Legacy/Nested structure
+                    responseData.id || responseData.conversationId || responseData._id;
+
+                // Avoid navigating to 'undefined' string or empty ID
+                if (newId && newId !== 'undefined') {
+                    // 1. SEED USER MESSAGE (Optimistic) - BEFORE Navigation
+                    const now = new Date().toISOString();
+                    queryClient.setQueryData(['chatMessages', newId], [
+                        {
+                            id: `init-user-${Date.now()}`,
+                            conversationId: newId,
+                            content: text,
+                            role: 'user',
+                            createdAt: now
+                        }
+                    ]);
+
+                    // 2. NAVIGATE IMMEDIATELY
                     navigate(`/chat/${newId}`);
-                } else if (response.answer) {
-                    // If backend didn't give ID but gave answer, we might be stuck.
-                    // For now, let's just stay here (maybe reload history?)
-                    // But typically we should get an ID. 
-                    // If we use 'temp-new-id', it won't persist on reload.
-                    // Let's force a history refresh or similar if possible.
-                }
 
+                    try {
+                        // 3. SEND MESSAGE (Background)
+                        const completion = await chatAPI.sendMessage(newId, text, 'user');
+
+                        // 4. UPDATE CACHE WITH AI RESPONSE
+                        queryClient.setQueryData(['chatMessages', newId], (old: any[] = []) => [
+                            ...old,
+                            {
+                                id: completion.id || `init-ai-${Date.now()}`,
+                                conversationId: newId,
+                                content: completion.answer,
+                                role: 'assistant',
+                                createdAt: new Date().toISOString(),
+                                sources: completion.sources?.map((s: any) => ({ title: s.title, ref: s.id })),
+                                metadata: { confidence: completion.confidence }
+                            }
+                        ]);
+                    } catch (sendErr) {
+                        console.error("Failed to send follow-up message", sendErr);
+                    }
+                } else {
+                    console.error("Critical: Initial conversation ID is missing or invalid", response);
+                    // Stay on current page or show error, do NOT navigate to /chat/undefined
+                }
             } finally {
                 setPendingMessage(null);
             }
         } catch (error) {
             console.error("Failed to send message", error);
             setPendingMessage(null);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -146,7 +235,7 @@ export const ChatInterface: React.FC = () => {
                             />
                         )}
 
-                        {(isSending || isCreating) && (
+                        {(isSubmitting || isCreating) && (
                             <div className="flex justify-start animate-pulse mb-8">
                                 <div className="bg-surface-hover h-12 w-32 rounded-lg flex items-center justify-center">
                                     <span className="text-text-tertiary text-sm">Thinking...</span>
@@ -161,7 +250,7 @@ export const ChatInterface: React.FC = () => {
                     <div className="max-w-3xl mx-auto">
                         <ChatInputBox
                             onSubmit={handleSendMessage}
-                            disabled={isSending}
+                            disabled={isSubmitting}
                             placeholder="Ask follow-up question..."
                         />
                         <div className="text-center mt-3">
