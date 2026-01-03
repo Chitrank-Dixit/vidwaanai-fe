@@ -279,6 +279,25 @@ export const useChat = (conversationId?: string) => {
         }
     });
 
+    // Delete conversation
+    const deleteConversationMutation = useMutation({
+        mutationFn: chatAPI.deleteConversation,
+        onMutate: async (idToDelete) => {
+            await queryClient.cancelQueries({ queryKey: ['conversations'] });
+            const previousConversations = queryClient.getQueryData(['conversations']);
+            queryClient.setQueryData(['conversations'], (old: any[] = []) =>
+                old.filter(c => (c.id || c._id) !== idToDelete)
+            );
+            return { previousConversations };
+        },
+        onError: (_err, _id, context) => {
+            queryClient.setQueryData(['conversations'], context?.previousConversations);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        }
+    });
+
     // Fetch all conversations history
     const historyQuery = useQuery({
         queryKey: ['conversations'],
@@ -300,6 +319,9 @@ export const useChat = (conversationId?: string) => {
 
         createConversation: createConversationMutation.mutateAsync,
         isCreating: createConversationMutation.isPending,
+
+        deleteConversation: deleteConversationMutation.mutateAsync,
+        isDeleting: deleteConversationMutation.isPending,
 
         history: historyQuery.data || [],
         isLoadingHistory: historyQuery.isLoading,

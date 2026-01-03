@@ -37,15 +37,24 @@ export const ChatInterface: React.FC = () => {
 
     const {
         messages,
+        streamMessage,
+        history,
         createConversation,
         isCreating,
-        history,
-        streamMessage
+        deleteConversation
     } = useChat(conversationId);
 
     // Local state for optimistic updates during new chat creation
     const [pendingMessage, setPendingMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleDeleteConversation = async (id: string) => {
+        // Optimistic delete handled by hook. We just navigate if needed.
+        if (id === conversationId) {
+            navigate('/chat');
+        }
+        await deleteConversation(id);
+    };
 
     // Handle initial query from homepage
     useEffect(() => {
@@ -153,6 +162,7 @@ export const ChatInterface: React.FC = () => {
                     navigate(`/chat/${id}`);
                 }}
                 onNewChat={() => navigate('/chat')}
+                onDelete={handleDeleteConversation}
             />
 
             {/* Main Content */}
