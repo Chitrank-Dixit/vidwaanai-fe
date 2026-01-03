@@ -62,7 +62,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         </div>
 
                         {/* Scrollable list */}
-                        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2 scrollbar-thin scrollbar-thumb-surface-active scrollbar-track-transparent">
+                        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-2 scrollbar-clean">
                             <div className="text-xs font-semibold text-text-tertiary px-2 pt-2 pb-1">
                                 Recent
                             </div>

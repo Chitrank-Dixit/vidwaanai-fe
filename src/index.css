@@ -67,4 +67,24 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Clean Scrollbar (ChatGPT-like) */
+  .scrollbar-clean::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .scrollbar-clean::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-clean::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface-active);
+    border-radius: 20px;
+    opacity: 0.5;
+  }
+
+  .scrollbar-clean:hover::-webkit-scrollbar-thumb {
+    background-color: var(--color-text-tertiary);
+  }
 }
