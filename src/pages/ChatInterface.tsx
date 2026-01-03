@@ -5,6 +5,7 @@ import { ChatSidebar } from '../components/chat/ChatSidebar';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessage } from '../components/chat/ChatMessage';
 import { TypingIndicator } from '../components/chat/TypingIndicator';
+import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useChat } from '../hooks/useChat';
 import { UserDropdown } from '../components/layout/UserDropdown';
 import { useAuth } from '../hooks/useAuth';
@@ -157,7 +158,7 @@ export const ChatInterface: React.FC = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full relative w-full">
                 {/* Header */}
-                <header className="h-16 border-b border-text-tertiary/10 bg-surface/80 backdrop-blur-md flex items-center justify-between px-4 sticky top-0 z-30">
+                <header className="h-16 border-b border-surface-active bg-surface/80 backdrop-blur-md flex items-center justify-between px-4 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -169,6 +170,7 @@ export const ChatInterface: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        <ThemeToggle />
                         <button className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary">
                             <Database className="w-5 h-5" />
                         </button>
