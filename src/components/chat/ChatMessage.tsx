@@ -54,7 +54,7 @@ export const AssistantMessage: React.FC<MessageProps> = ({ content, entities, so
 
             <div className="flex-1 space-y-4">
                 {/* Main Content */}
-                <Card className="bg-surface border-text-tertiary/10 !p-5 leading-relaxed text-text-primary shadow-sm hover:shadow-md transition-shadow">
+                <Card className="bg-surface-hover dark:bg-surface-active/30 border-none !p-5 leading-relaxed text-text-primary shadow-sm rounded-2xl rounded-tl-sm">
                     <div className="prose prose-invert max-w-none">
                         {/* We can use ReactMarkdown here later */}
                         <p className="whitespace-pre-wrap">{content}</p>
