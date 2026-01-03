@@ -41,7 +41,10 @@ export const ChatInterface: React.FC = () => {
         history,
         createConversation,
         isCreating,
-        deleteConversation
+        deleteConversation,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
     } = useChat(conversationId);
 
     // Local state for optimistic updates during new chat creation
@@ -163,6 +166,9 @@ export const ChatInterface: React.FC = () => {
                 }}
                 onNewChat={() => navigate('/chat')}
                 onDelete={handleDeleteConversation}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
             />
 
             {/* Main Content */}

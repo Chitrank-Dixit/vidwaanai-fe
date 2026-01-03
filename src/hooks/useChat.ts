@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { chatAPI, type Message } from '../api/chat';
 
@@ -223,59 +223,36 @@ export const useChat = (conversationId?: string) => {
             // INSTEAD: Manually update the conversation list cache (Optimistic-like)
             const newId = response.id || response.conversationId || response.session_id || response._id;
             if (newId) {
-                queryClient.setQueryData(['conversations'], (old: any[] = []) => {
+                queryClient.setQueryData(['conversations'], (old: any) => {
+                    // Check if it's InfiniteData structure
+                    if (!old || !old.pages) return old;
+
                     const newConv = {
                         id: newId,
                         title: (initialMessage || 'New Chat').slice(0, 30),
                         updatedAt: new Date().toISOString(),
                         createdAt: new Date().toISOString(),
-                        messageCount: 2, // Initial user message + AI response
+                        messageCount: 2,
                     };
-                    // Prepend the new conversation
-                    return [newConv, ...old];
-                });
-            }
 
-            // If the creation response includes an Answer, add it to the message list!
-            if (response && response.answer) {
-                const now = new Date().toISOString();
-
-                // We suspect the ID might be missing, but if we have it on data:
-                const targetId = newId || 'temp-new-id';
-
-                // Add to cache
-                queryClient.setQueryData(['chatMessages', targetId], () => {
-                    const messagesToSend: Message[] = [];
-
-                    // 1. Add User Message if provided
-                    if (initialMessage) {
-                        messagesToSend.push({
-                            id: `temp-user-init-${Date.now()}`,
-                            conversationId: targetId,
-                            content: initialMessage,
-                            role: 'user',
-                            createdAt: now,
-                        });
+                    // Prepend to the first page
+                    const newPages = [...old.pages];
+                    if (newPages.length > 0) {
+                        newPages[0] = {
+                            ...newPages[0],
+                            conversations: [newConv, ...(newPages[0].conversations || [])]
+                        };
                     }
 
-                    // 2. Add AI Message
-                    const aiMsg: Message = {
-                        id: `ai-${Date.now()}`,
-                        conversationId: targetId,
-                        content: response.answer,
-                        role: 'assistant',
-                        createdAt: now,
-                        sources: response.sources?.map((s: any) => ({
-                            title: s.title,
-                            ref: s.id
-                        })),
-                        metadata: { confidence: response.confidence }
+                    return {
+                        ...old,
+                        pages: newPages
                     };
-                    messagesToSend.push(aiMsg);
-
-                    return messagesToSend;
                 });
             }
+
+            // Message seeding is handled in ChatInterface.tsx to coordinate with navigation
+            // if (response && response.answer) { ... }
         }
     });
 
@@ -285,9 +262,17 @@ export const useChat = (conversationId?: string) => {
         onMutate: async (idToDelete) => {
             await queryClient.cancelQueries({ queryKey: ['conversations'] });
             const previousConversations = queryClient.getQueryData(['conversations']);
-            queryClient.setQueryData(['conversations'], (old: any[] = []) =>
-                old.filter(c => (c.id || c._id) !== idToDelete)
-            );
+
+            queryClient.setQueryData(['conversations'], (old: any) => {
+                if (!old || !old.pages) return old;
+                return {
+                    ...old,
+                    pages: old.pages.map((page: any) => ({
+                        ...page,
+                        conversations: page.conversations.filter((c: any) => c.id !== idToDelete)
+                    }))
+                };
+            });
             return { previousConversations };
         },
         onError: (_err, _id, context) => {
@@ -298,12 +283,19 @@ export const useChat = (conversationId?: string) => {
         }
     });
 
-    // Fetch all conversations history
-    const historyQuery = useQuery({
+    // Fetch all conversations history (Infinite)
+    const historyQuery = useInfiniteQuery({
         queryKey: ['conversations'],
-        queryFn: chatAPI.getConversations,
-        select: (data) => data || [],
+        queryFn: ({ pageParam = 1 }) => chatAPI.getConversations(pageParam as number, 20),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages) => {
+            // Assume 20 is the limit. If we got less, no more pages.
+            if (!lastPage.conversations || lastPage.conversations.length < 20) return undefined;
+            return allPages.length + 1;
+        }
     });
+
+    const flattenedHistory = historyQuery.data?.pages.flatMap(page => page.conversations) || [];
 
     return {
         messages: messagesQuery.data || [],
@@ -323,7 +315,12 @@ export const useChat = (conversationId?: string) => {
         deleteConversation: deleteConversationMutation.mutateAsync,
         isDeleting: deleteConversationMutation.isPending,
 
-        history: historyQuery.data || [],
+        history: flattenedHistory,
         isLoadingHistory: historyQuery.isLoading,
+
+        // Pagination
+        fetchNextPage: historyQuery.fetchNextPage,
+        hasNextPage: historyQuery.hasNextPage,
+        isFetchingNextPage: historyQuery.isFetchingNextPage,
     };
 };

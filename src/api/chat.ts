@@ -51,25 +51,22 @@ export const chatAPI = {
         return [];
     },
 
-    // Get all conversations
-    getConversations: async (): Promise<Conversation[]> => {
-        const response = await apiClient.get('/api/chat/conversations');
+    // Get all conversations (paginated)
+    getConversations: async (page = 1, limit = 20): Promise<{ conversations: Conversation[]; pagination: any }> => {
+        const response = await apiClient.get('/api/chat/conversations', {
+            params: { page, limit }
+        });
         const items = chatAPI._extractArray(response.data, 'conversations');
 
-        // Normalize items to ensure 'id' exists
-        return items
-            .map((item: any) => ({
-                ...item,
-                id: item.id || item.conversation_id || item._id,
-            }))
-            .filter((item) => item.id); // STRICTLY filter out items with no ID to prevent /chat/undefined redirects
-    }, // Add comma here if needed by context, but typically replace_file_content replaces block. 
-    // Check StartLine/EndLine carefully.
-    // The original code was: 
-    // getConversations: async (): Promise<Conversation[]> => {
-    //     const response = await apiClient.get('/api/chat/conversations');
-    //     return chatAPI._extractArray(response.data, 'conversations');
-    // },
+        // Normalize items to ensure 'id' exists and return with pagination
+        return {
+            conversations: items.map((c: any) => ({
+                ...c,
+                id: c.id || c._id || c.conversationId
+            })),
+            pagination: response.data.pagination
+        };
+    },
 
     // Create new conversation
     createConversation: async (

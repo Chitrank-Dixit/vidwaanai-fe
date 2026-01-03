@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, MoreHorizontal, Trash2 } from 'lucide-react';
@@ -14,6 +14,9 @@ interface ChatSidebarProps {
     onSelect: (id: string) => void;
     onNewChat: () => void;
     onDelete: (id: string) => void;
+    hasNextPage?: boolean;
+    fetchNextPage?: () => void;
+    isFetchingNextPage?: boolean;
 }
 
 export const ChatSidebar: React.FC<ChatSidebarProps> = ({
@@ -24,17 +27,38 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
     currentId,
     onSelect,
     onNewChat,
-    onDelete
+    onDelete,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage
 }) => {
     const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
+    const loadMoreRef = useRef<HTMLDivElement>(null);
 
-    // Close menu when clicking outside (simple implementation)
-    // We will rely on e.stopPropagation() on the trigger and menu
-    React.useEffect(() => {
+    // Close menu when clicking outside
+    useEffect(() => {
         const handleClick = () => setOpenMenuId(null);
         window.addEventListener('click', handleClick);
         return () => window.removeEventListener('click', handleClick);
     }, []);
+
+    // Infinite Scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasNextPage) {
+                    fetchNextPage?.();
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (loadMoreRef.current) {
+            observer.observe(loadMoreRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [hasNextPage, fetchNextPage]);
     return (
         <AnimatePresence>
             {open && (
@@ -136,6 +160,8 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     </div>
                                 ))
                             )}
+                            <div ref={loadMoreRef} className="h-4 w-full" />
+                            {isFetchingNextPage && <div className="text-center py-2 text-xs text-text-tertiary">Loading...</div>}
                         </div>
 
                         {/* Footer */}

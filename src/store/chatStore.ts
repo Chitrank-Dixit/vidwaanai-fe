@@ -29,7 +29,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await chatAPI.getConversations();
-            set({ conversations: response || [], isLoading: false });
+            set({ conversations: response.conversations || [], isLoading: false });
         } catch (error: any) {
             set({
                 error: error.message || 'Failed to load conversations',
