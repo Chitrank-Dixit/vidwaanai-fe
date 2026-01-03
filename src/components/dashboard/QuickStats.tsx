@@ -16,16 +16,16 @@ export const QuickStats: React.FC = () => {
                 return (
                     <div
                         key={item.name}
-                        className="relative overflow-hidden rounded-lg bg-white dark:bg-indigo p-5 shadow border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+                        className="relative overflow-hidden rounded-lg bg-surface p-5 shadow border border-text-tertiary/10 hover:shadow-md transition-shadow"
                     >
                         <dt>
-                            <div className="absolute rounded-md bg-saffron/10 p-3">
-                                <Icon className="h-6 w-6 text-saffron dark:text-gold" aria-hidden="true" />
+                            <div className="absolute rounded-md bg-primary/10 p-3">
+                                <Icon className="h-6 w-6 text-primary" aria-hidden="true" />
                             </div>
-                            <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">{item.name}</p>
+                            <p className="ml-16 truncate text-sm font-medium text-text-secondary">{item.name}</p>
                         </dt>
                         <dd className="ml-16 flex items-baseline pb-1 sm:pb-2">
-                            <p className="text-2xl font-semibold text-charcoal dark:text-white">{item.value}</p>
+                            <p className="text-2xl font-semibold text-text-primary">{item.value}</p>
                             <p className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
                                 <span className="sr-only">{item.changeType === 'increase' ? 'Increased by' : 'Decreased by'}</span>
                                 {item.change}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 
 interface MainLayoutProps {
@@ -8,19 +7,15 @@ interface MainLayoutProps {
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-cream dark:bg-indigo-dark text-charcoal dark:text-gray-100">
-            {/* Sidebar (Desktop) */}
-            <div className="hidden lg:block relative z-20">
-                <Sidebar isOpen={sidebarOpen} />
-            </div>
+        <div className="flex h-screen overflow-hidden bg-background text-text-primary">
+            {/* Sidebar removed as per user request */}
 
             <div className="flex-1 flex flex-col min-w-0">
                 <Header
-                    onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+                    onMenuToggle={() => { }} // No-op for desktop
                     onMobileMenuToggle={() => setMobileMenuOpen(true)}
                 />
 

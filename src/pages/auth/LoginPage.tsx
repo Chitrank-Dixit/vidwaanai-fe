@@ -4,6 +4,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+
 export const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
@@ -15,13 +17,18 @@ export const LoginPage: React.FC = () => {
     }, [isAuthenticated, navigate]);
 
     return (
-        <div className="flex min-h-screen bg-cream dark:bg-indigo-dark">
+        <div className="flex min-h-screen bg-background text-text-primary relative">
+            {/* Theme Toggle */}
+            <div className="absolute top-4 right-4 z-50">
+                <ThemeToggle />
+            </div>
+
             <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 w-full lg:w-1/2 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
                     <div className="text-center lg:text-left mb-10">
-                        <span className="text-3xl font-display font-bold text-saffron dark:text-gold block mb-2">🕉️ Vidwaan AI</span>
-                        <h2 className="text-3xl font-extrabold text-charcoal dark:text-white">Welcome Back</h2>
-                        <p className="mt-2 text-sm text-charcoal/70 dark:text-gray-400">
+                        <span className="text-3xl font-display font-bold text-primary block mb-2">🕉️ Vidwaan AI</span>
+                        <h2 className="text-3xl font-extrabold text-text-primary">Welcome Back</h2>
+                        <p className="mt-2 text-sm text-text-secondary">
                             Login to continue your spiritual journey
                         </p>
                     </div>
@@ -37,7 +44,7 @@ export const LoginPage: React.FC = () => {
                                     <div className="w-full border-t border-gray-300 dark:border-gray-700" />
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="bg-cream dark:bg-indigo-dark px-2 text-gray-500">Or continue with</span>
+                                    <span className="bg-background px-2 text-text-tertiary">Or continue with</span>
                                 </div>
                             </div>
 
@@ -47,14 +54,14 @@ export const LoginPage: React.FC = () => {
                         </div>
 
                         <div className="mt-6 text-center space-y-2">
-                            <p className="text-sm text-charcoal/80 dark:text-gray-300">
+                            <p className="text-sm text-text-secondary">
                                 Don't have an account?{' '}
-                                <Link to="/auth/register" className="font-medium text-saffron hover:text-saffron-dark">
+                                <Link to="/auth/register" className="font-medium text-primary hover:text-primary-hover transition-colors">
                                     Sign up
                                 </Link>
                             </p>
                             <p>
-                                <Link to="/auth/forgot-password" className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-gray-300">
+                                <Link to="/auth/forgot-password" className="text-sm font-medium text-text-tertiary hover:text-text-primary transition-colors">
                                     Forgot password?
                                 </Link>
                             </p>
@@ -66,8 +73,8 @@ export const LoginPage: React.FC = () => {
             {/* Right side image/feature list (Desktop) */}
             <div className="hidden lg:block relative w-0 flex-1">
                 <div className="absolute inset-0 shadow-lg bg-[url('https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2560&auto=format&fit=crop')] bg-cover bg-center">
-                    <div className="absolute inset-0 bg-indigo-900/40 mix-blend-multiply" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-20">
+                    <div className="absolute inset-0 bg-black/60 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-20">
                         <h3 className="text-4xl font-display font-bold text-white mb-6">Explore Vedic Wisdom</h3>
                         <ul className="space-y-4 text-white/90 text-lg">
                             <li className="flex items-center gap-3">✨ AI-powered scripture guidance</li>

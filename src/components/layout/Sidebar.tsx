@@ -55,20 +55,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     return (
         <aside
             className={cn(
-                "fixed lg:relative inset-y-0 left-0 z-20 w-64 bg-white dark:bg-indigo shadow-xl border-r border-silver dark:border-purple-dark transform transition-transform duration-200 ease-in-out lg:translate-x-0 h-screen overflow-y-auto flex flex-col",
+                "fixed lg:relative inset-y-0 left-0 z-20 w-64 bg-surface shadow-xl border-r border-text-tertiary/10 transform transition-transform duration-200 ease-in-out lg:translate-x-0 h-screen overflow-y-auto flex flex-col",
                 !isOpen && "lg:w-20" // Collapsed state for desktop
             )}
         >
             {/* Logo Area (Desktop Collapsed/Expanded logic) */}
-            <div className={cn("h-16 flex items-center px-6 border-b border-silver dark:border-purple-dark", !isOpen && "justify-center px-0")}>
-                <span className="text-xl font-display font-bold text-saffron dark:text-gold truncate">
+            <div className={cn("h-16 flex items-center px-6 border-b border-text-tertiary/10", !isOpen && "justify-center px-0")}>
+                <span className="text-xl font-display font-bold text-primary truncate">
                     {isOpen ? '🕉️ Vidwaan' : '🕉️'}
                 </span>
             </div>
 
             <nav className="flex-1 py-6 px-3 space-y-8">
                 <div className="space-y-1">
-                    {isOpen && <p className="px-3 text-xs font-semibold text-charcoal/60 dark:text-gray-400 uppercase tracking-wider mb-2">Menu</p>}
+                    {isOpen && <p className="px-3 text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Menu</p>}
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -78,13 +78,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                                 className={cn(
                                     "flex items-center gap-3 px-3 py-2 rounded-md transition-colors group",
                                     isActive(item.path)
-                                        ? "bg-saffron/10 text-saffron dark:text-gold"
-                                        : "text-charcoal dark:text-gray-300 hover:bg-cream dark:hover:bg-indigo-dark hover:text-saffron-dark",
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-text-secondary hover:bg-surface-hover hover:text-primary",
                                     !isOpen && "justify-center"
                                 )}
                                 title={!isOpen ? item.label : undefined}
                             >
-                                <Icon className={cn("h-5 w-5 flex-shrink-0", isActive(item.path) && "text-saffron dark:text-gold")} />
+                                <Icon className={cn("h-5 w-5 flex-shrink-0", isActive(item.path) && "text-primary")} />
                                 {isOpen && <span className="font-medium">{item.label}</span>}
                             </Link>
                         )
@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
                 {adminItems.length > 0 && (
                     <div className="space-y-1">
-                        {isOpen && <p className="px-3 text-xs font-semibold text-charcoal/60 dark:text-gray-400 uppercase tracking-wider mb-2">Administration</p>}
+                        {isOpen && <p className="px-3 text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Administration</p>}
                         {adminItems.map((item) => {
                             const Icon = item.icon;
                             return (
@@ -103,8 +103,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                                     className={cn(
                                         "flex items-center gap-3 px-3 py-2 rounded-md transition-colors group",
                                         isActive(item.path)
-                                            ? "bg-saffron/10 text-saffron dark:text-gold"
-                                            : "text-charcoal dark:text-gray-300 hover:bg-cream dark:hover:bg-indigo-dark hover:text-saffron-dark",
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-text-secondary hover:bg-surface-hover hover:text-primary",
                                         !isOpen && "justify-center"
                                     )}
                                     title={!isOpen ? item.label : undefined}
@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                 )}
 
                 <div className="space-y-1">
-                    {isOpen && <p className="px-3 text-xs font-semibold text-charcoal/60 dark:text-gray-400 uppercase tracking-wider mb-2">Account</p>}
+                    {isOpen && <p className="px-3 text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">Account</p>}
                     {userItems.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -128,8 +128,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                                 className={cn(
                                     "flex items-center gap-3 px-3 py-2 rounded-md transition-colors group",
                                     isActive(item.path)
-                                        ? "bg-saffron/10 text-saffron dark:text-gold"
-                                        : "text-charcoal dark:text-gray-300 hover:bg-cream dark:hover:bg-indigo-dark hover:text-saffron-dark",
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-text-secondary hover:bg-surface-hover hover:text-primary",
                                     !isOpen && "justify-center"
                                 )}
                                 title={!isOpen ? item.label : undefined}
@@ -144,9 +144,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
             {/* Optional Helper / Footer Area */}
             {isOpen && (
-                <div className="p-4 border-t border-silver dark:border-purple-dark">
-                    <div className="rounded-lg bg-cream/50 dark:bg-purple-dark/20 p-4">
-                        <p className="text-xs text-charcoal/80 dark:text-gray-400 text-center">
+                <div className="p-4 border-t border-text-tertiary/10">
+                    <div className="rounded-lg bg-surface-hover p-4">
+                        <p className="text-xs text-text-secondary text-center">
                             "Wisdom is the greatest wealth."
                         </p>
                     </div>

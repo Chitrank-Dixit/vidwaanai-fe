@@ -1,21 +1,326 @@
-import { useChatStore } from '../store/chatStore';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { chatAPI, type Message } from '../api/chat';
 
-export const useChat = () => {
-    const store = useChatStore();
+export const useChat = (conversationId?: string) => {
+    const queryClient = useQueryClient();
+    const [isStreaming, setIsStreaming] = useState(false);
+
+    // Fetch messages for active conversation
+    const messagesQuery = useQuery({
+        queryKey: ['chatMessages', conversationId],
+        queryFn: () => chatAPI.getMessages(conversationId!),
+        enabled: !!conversationId && conversationId !== 'undefined' && !conversationId.startsWith('temp-'),
+        staleTime: 60000,
+        select: (data) => data || [],
+    });
+
+    const streamMessage = async (content: string) => {
+        if (!conversationId) return;
+
+        setIsStreaming(true);
+
+        // 1. Optimistic User Update
+        const now = new Date().toISOString();
+        queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => [
+            ...old,
+            {
+                id: `temp-user-${Date.now()}`,
+                conversationId,
+                content,
+                role: 'user',
+                createdAt: now,
+            },
+            {
+                id: `ai-streaming-${Date.now()}`,
+                conversationId,
+                content: '', // Start empty
+                role: 'assistant',
+                createdAt: now,
+                isStreaming: true
+            }
+        ]);
+
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+            const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': accessToken ? `Bearer ${accessToken}` : '',
+                },
+                body: JSON.stringify({ conversationId, question: content })
+            });
+
+            if (!response.ok) throw new Error(response.statusText);
+            if (!response.body) throw new Error('No response body');
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let aiContent = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const dataStr = line.slice(6);
+                        if (dataStr === '[DONE]') continue;
+                        try {
+                            const data = JSON.parse(dataStr);
+                            if (data.token) {
+                                aiContent += data.token;
+
+                                // Update Cache
+                                queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                                    const newMessages = [...old];
+                                    const lastMsg = newMessages[newMessages.length - 1];
+                                    if (lastMsg && lastMsg.role === 'assistant') {
+                                        lastMsg.content = aiContent;
+                                    }
+                                    return newMessages;
+                                });
+                            }
+                        } catch (e) {
+                            // ignore
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn("Streaming failed, falling back to standard send", error);
+            try {
+                // Fallback: Use standard REST API
+                const completion = await chatAPI.sendMessage(conversationId, content, 'user');
+
+                // Update Cache: Replace the empty streaming message with the full response
+                queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                    // Normalize sources
+                    const sources = completion.sources?.map((s: any) => ({
+                        title: s.title,
+                        ref: s.id
+                    }));
+
+                    return old.map(m => {
+                        // Find our specific placeholder using the timestamp if possible, 
+                        // or just the last assistant message that is streaming.
+                        if (m.isStreaming) {
+                            return {
+                                ...m,
+                                id: completion.id || m.id,
+                                content: completion.answer,
+                                isStreaming: false,
+                                sources: sources,
+                                metadata: { confidence: completion.confidence }
+                            };
+                        }
+                        return m;
+                    });
+                });
+            } catch (fallbackError) {
+                console.error("Fallback failed", fallbackError);
+            }
+        } finally {
+            setIsStreaming(false);
+            // Invalidate to ensure consistency, but delay slightly or trust the update?
+            // If we invalidate immediately, we might see a flash. 
+            // The optimistic update above should be enough. 
+            // We can invalidate strictly if fallback failed.
+            // But let's invalidate to be safe, syncing with server state.
+            queryClient.invalidateQueries({ queryKey: ['chatMessages', conversationId] });
+        }
+    };
+
+    // Send message mutation
+    const sendMessageMutation = useMutation({
+        mutationFn: async ({ content, role = 'user' }: { content: string; role?: 'user' | 'assistant' }) => {
+            if (!conversationId) throw new Error('No conversation ID');
+            // Return BOTH the sent content and the API response
+            const response = await chatAPI.sendMessage(conversationId, content, role);
+            return { sentContent: content, apiResponse: response };
+        },
+        onMutate: async ({ content, role = 'user' }) => {
+            // Cancel any outgoing refetches so they don't overwrite our optimistic update
+            await queryClient.cancelQueries({ queryKey: ['chatMessages', conversationId] });
+
+            // Snapshot the previous value
+            const previousMessages = queryClient.getQueryData<Message[]>(['chatMessages', conversationId]);
+
+            // Optimistically update to the new value
+            queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                const now = new Date().toISOString();
+                const optimisticMsg: Message = {
+                    id: `temp-user-${Date.now()}`,
+                    conversationId: conversationId!,
+                    content,
+                    role: role as 'user' | 'assistant',
+                    createdAt: now,
+                };
+                return [...old, optimisticMsg];
+            });
+
+            // Return a context object with the snapshotted value
+            return { previousMessages };
+        },
+        onError: (_err, _newTodo, context) => {
+            queryClient.setQueryData(['chatMessages', conversationId], context?.previousMessages);
+        },
+        onSuccess: ({ apiResponse }) => {
+            // Do NOT invalidate immediately. Trust the API response.
+            // Race condition: Server might not have persisted the AI message yet.
+            // queryClient.invalidateQueries({ queryKey: ['chatMessages', conversationId] });
+
+            console.log('[useChat] sendMessage SUCCESS. API Response:', apiResponse);
+
+            queryClient.setQueryData(['chatMessages', conversationId], (old: Message[] = []) => {
+                const now = new Date().toISOString();
+                console.log('[useChat] Updating cache. Old messages:', old.length);
+
+                // 2. Create Assistant Message from API Response
+                // Note: The User message was already added in onMutate.
+                // We just append the AI response here.
+                const assistantMessage: Message = {
+                    id: apiResponse.id || `temp-ai-${Date.now()}`,
+                    conversationId: conversationId!,
+                    content: apiResponse.answer,
+                    role: 'assistant',
+                    createdAt: now,
+                    sources: apiResponse.sources?.map((s: any) => ({
+                        title: s.title,
+                        ref: s.id
+                    })),
+                    metadata: {
+                        confidence: apiResponse.confidence
+                    }
+                };
+
+                // Deduplicate: Check if this message ID already exists (from the refetch?)
+                // Actually, if we invalidate, the refetch might happen concurrently.
+                // Optimistic update + Invalidate is the safest pattern.
+                // But we still append here to ensure immediate feedback if refetch is slow.
+                if (old.some(m => m.id === assistantMessage.id)) return old;
+
+                return [...old, assistantMessage];
+            });
+        },
+    });
+
+    // Create conversation mutation
+    const createConversationMutation = useMutation({
+        mutationFn: ({ title, initialMessage }: { title: string; initialMessage?: string }) =>
+            chatAPI.createConversation(title).then(response => ({ response, initialMessage })),
+        onSuccess: ({ response, initialMessage }) => {
+            // STOP THE REDIRECT LOOP: Do NOT invalidate 'conversations' immediately.
+            // Invalidating triggers a refetch which might be causing the layout/sidebar to remount or router to reset.
+            // queryClient.invalidateQueries({ queryKey: ['conversations'] });
+
+            // INSTEAD: Manually update the conversation list cache (Optimistic-like)
+            const newId = response.id || response.conversationId || response.session_id || response._id;
+            if (newId) {
+                queryClient.setQueryData(['conversations'], (old: any) => {
+                    // Check if it's InfiniteData structure
+                    if (!old || !old.pages) return old;
+
+                    const newConv = {
+                        id: newId,
+                        title: (initialMessage || 'New Chat').slice(0, 30),
+                        updatedAt: new Date().toISOString(),
+                        createdAt: new Date().toISOString(),
+                        messageCount: 2,
+                    };
+
+                    // Prepend to the first page
+                    const newPages = [...old.pages];
+                    if (newPages.length > 0) {
+                        newPages[0] = {
+                            ...newPages[0],
+                            conversations: [newConv, ...(newPages[0].conversations || [])]
+                        };
+                    }
+
+                    return {
+                        ...old,
+                        pages: newPages
+                    };
+                });
+            }
+
+            // Message seeding is handled in ChatInterface.tsx to coordinate with navigation
+            // if (response && response.answer) { ... }
+        }
+    });
+
+    // Delete conversation
+    const deleteConversationMutation = useMutation({
+        mutationFn: chatAPI.deleteConversation,
+        onMutate: async (idToDelete) => {
+            await queryClient.cancelQueries({ queryKey: ['conversations'] });
+            const previousConversations = queryClient.getQueryData(['conversations']);
+
+            queryClient.setQueryData(['conversations'], (old: any) => {
+                if (!old || !old.pages) return old;
+                return {
+                    ...old,
+                    pages: old.pages.map((page: any) => ({
+                        ...page,
+                        conversations: page.conversations.filter((c: any) => c.id !== idToDelete)
+                    }))
+                };
+            });
+            return { previousConversations };
+        },
+        onError: (_err, _id, context) => {
+            queryClient.setQueryData(['conversations'], context?.previousConversations);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        }
+    });
+
+    // Fetch all conversations history (Infinite)
+    const historyQuery = useInfiniteQuery({
+        queryKey: ['conversations'],
+        queryFn: ({ pageParam = 1 }) => chatAPI.getConversations(pageParam as number, 20),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages) => {
+            // Assume 20 is the limit. If we got less, no more pages.
+            if (!lastPage.conversations || lastPage.conversations.length < 20) return undefined;
+            return allPages.length + 1;
+        }
+    });
+
+    const flattenedHistory = historyQuery.data?.pages.flatMap(page => page.conversations) || [];
 
     return {
-        conversations: store.conversations,
-        currentConversation: store.currentConversation,
-        messages: store.messages,
-        isLoading: store.isLoading,
-        isSending: store.isSending,
-        error: store.error,
+        messages: messagesQuery.data || [],
+        isLoadingMessages: messagesQuery.isLoading,
+        errorMessages: messagesQuery.error,
 
-        loadConversations: store.loadConversations,
-        createConversation: store.createConversation,
-        selectConversation: store.selectConversation,
-        sendMessage: store.sendMessage, // Takes just text, internal store knows conversationId
-        loadMessages: store.selectConversation, // Alias for compatibility
-        clearError: store.clearError
+        sendMessage: sendMessageMutation.mutateAsync,
+        isSending: sendMessageMutation.isPending,
+
+        // STREAMING
+        streamMessage,
+        isStreaming,
+
+        createConversation: createConversationMutation.mutateAsync,
+        isCreating: createConversationMutation.isPending,
+
+        deleteConversation: deleteConversationMutation.mutateAsync,
+        isDeleting: deleteConversationMutation.isPending,
+
+        history: flattenedHistory,
+        isLoadingHistory: historyQuery.isLoading,
+
+        // Pagination
+        fetchNextPage: historyQuery.fetchNextPage,
+        hasNextPage: historyQuery.hasNextPage,
+        isFetchingNextPage: historyQuery.isFetchingNextPage,
     };
 };
