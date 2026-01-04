@@ -48,8 +48,22 @@ describe('Chat API', () => {
 
         const result = await chatAPI.getConversations();
 
-        expect(apiClient.get).toHaveBeenCalledWith('/api/chat/conversations');
-        expect(result).toEqual(mockResponse.data);
+        expect(apiClient.get).toHaveBeenCalledWith('/api/chat/conversations', {
+            params: {
+                page: 1,
+                limit: 20
+            }
+        });
+        const expectedResult = {
+            conversations: [
+                {
+                    ...mockConversation,
+                    id: 'conv-123'
+                }
+            ],
+            pagination: undefined
+        };
+        expect(result).toEqual(expectedResult);
     });
 
     it('sendMessage should post message', async () => {
@@ -66,9 +80,13 @@ describe('Chat API', () => {
 
         expect(apiClient.post).toHaveBeenCalledWith('/api/chat/messages', {
             conversationId: 'conv-123',
-            content: 'Hello World',
+            text: 'Hello World',
             role: 'user',
         });
-        expect(result).toEqual(mockResponse.data);
+        const expectedResult = {
+            ...mockMessage,
+            answer: ''
+        };
+        expect(result).toEqual(expectedResult);
     });
 });

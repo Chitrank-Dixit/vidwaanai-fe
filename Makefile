@@ -1,4 +1,4 @@
-.PHONY: help dev build up down logs restart test lint clean
+.PHONY: help dev build up down logs restart test test-docker lint clean
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "  make logs     - View Docker logs"
 	@echo "  make restart  - Restart Docker containers"
 	@echo "  make test     - Run unit tests"
+	@echo "  make test-docker - Run tests in Docker"
 	@echo "  make lint     - Run linter"
 	@echo "  make clean    - Remove node_modules and dist"
 
@@ -32,6 +33,9 @@ restart: down up
 
 test:
 	npm test
+
+test-docker:
+	docker compose run --rm test
 
 lint:
 	npm run lint
