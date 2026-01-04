@@ -33,7 +33,7 @@ export const RegisterPage: React.FC = () => {
             <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 w-full lg:w-1/2 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
                     <div className="text-center lg:text-left mb-10">
-                        <span className="text-3xl font-display font-bold text-primary block mb-2">🕉️ Vidwaan AI</span>
+                        <span className="text-3xl font-display font-bold text-primary block mb-2">Vidwaan AI</span>
                         <h2 className="text-3xl font-extrabold text-text-primary">Begin Your Journey</h2>
                         <p className="mt-2 text-sm text-text-secondary">
                             Join thousands of seekers on their path

@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             {/* Logo Area (Desktop Collapsed/Expanded logic) */}
             <div className={cn("h-16 flex items-center px-6 border-b border-text-tertiary/10", !isOpen && "justify-center px-0")}>
                 <span className="text-xl font-display font-bold text-primary truncate">
-                    {isOpen ? '🕉️ Vidwaan' : '🕉️'}
+                    {isOpen ? 'Vidwaan' : 'V'}
                 </span>
             </div>
 

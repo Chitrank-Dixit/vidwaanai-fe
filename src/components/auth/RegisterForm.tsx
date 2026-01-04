@@ -52,7 +52,7 @@ export const RegisterForm = () => {
     };
 
     return (
-        <div className="relative w-full max-w-md space-y-8 rounded-xl bg-surface p-8 shadow-2xl border-l-4 border-l-primary border-t border-r border-b border-text-tertiary/10 z-10 transition-transform hover:-translate-y-1 duration-300">
+        <div className="relative w-full max-w-md space-y-8 rounded-xl bg-surface p-8 shadow-2xl border-l-4 border-l-primary border-t border-r border-b border-gray-100 dark:border-gray-800 z-10 transition-transform hover:-translate-y-1 duration-300">
             <div className="text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
                     <Sparkles className="h-8 w-8 text-primary" />
