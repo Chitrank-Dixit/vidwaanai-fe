@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle: _onMenuToggle, onM
     const { user } = useAuth();
 
     return (
-        <header className="h-16 bg-surface border-b border-text-tertiary/10 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
+        <header className="h-16 bg-surface border-b border-gray-200 dark:border-transparent flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
             <div className="flex items-center gap-4">
                 {/* Mobile Toggle */}
                 <button

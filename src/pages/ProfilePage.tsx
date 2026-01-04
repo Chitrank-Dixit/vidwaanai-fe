@@ -19,7 +19,7 @@ export const ProfilePage: React.FC = () => {
                 </h1>
             </div>
 
-            <div className="bg-surface shadow rounded-lg overflow-hidden border border-text-tertiary/10">
+            <div className="bg-surface shadow rounded-lg overflow-hidden border border-gray-100 dark:border-none">
                 <div className="px-4 py-5 sm:p-6">
                     <h3 className="text-lg font-medium leading-6 text-text-primary mb-4">Account Information</h3>
 
@@ -29,11 +29,11 @@ export const ProfilePage: React.FC = () => {
                         </div>
                     ) : !isEditing ? (
                         <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-text-tertiary/10 pb-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
                                 <label className="text-sm font-medium text-text-secondary">Full Name</label>
                                 <div className="sm:col-span-2 text-text-primary font-medium">{user.fullName || 'N/A'}</div>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-text-tertiary/10 pb-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
                                 <label className="text-sm font-medium text-text-secondary">Email</label>
                                 <div className="sm:col-span-2 text-text-primary">{user.email || 'N/A'}</div>
                             </div>
