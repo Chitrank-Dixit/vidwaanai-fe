@@ -17,7 +17,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-    user: null,
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     isAuthenticated: !!localStorage.getItem('accessToken'),
     isLoading: false,
     error: null,
@@ -26,6 +26,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await authAPI.login(credentials);
+            if (response.data.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
             set({
                 user: response.data.user,
                 isAuthenticated: true,
@@ -49,6 +52,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             // but commonly we might want to redirect to login or auto-login.
             // Here we just update state if user is returned.
             if (response.data.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
                 set({ user: response.data.user });
             }
             set({ isLoading: false });
@@ -69,6 +73,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             console.error('Logout error', error);
         } finally {
             // Clear local state regardless of server response
+            localStorage.removeItem('user');
             set({
                 user: null,
                 isAuthenticated: false,
