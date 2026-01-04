@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, Database } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { ChatSidebar } from '../components/chat/ChatSidebar';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessage } from '../components/chat/ChatMessage';
@@ -187,9 +187,7 @@ export const ChatInterface: React.FC = () => {
 
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
-                        <button className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary">
-                            <Database className="w-5 h-5" />
-                        </button>
+
                         <UserDropdown user={useAuth().user} />
                     </div>
                 </header>

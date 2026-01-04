@@ -80,8 +80,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     clearError: () => set({ error: null }),
 
-    checkAuth: () => {
+    checkAuth: async () => {
         const token = localStorage.getItem('accessToken');
-        set({ isAuthenticated: !!token });
+        if (token) {
+            set({ isAuthenticated: true });
+            // Fetch user profile if missing
+            if (!get().user) {
+                try {
+                    const response = await authAPI.getMe();
+                    if (response.data.user) {
+                        set({ user: response.data.user });
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch user profile:', error);
+                    // Optionally logout if token is invalid, but let's be safe for now
+                }
+            }
+        } else {
+            set({ isAuthenticated: false, user: null });
+        }
     }
 }));

@@ -164,17 +164,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                             {isFetchingNextPage && <div className="text-center py-2 text-xs text-text-tertiary">Loading...</div>}
                         </div>
 
-                        {/* Footer */}
-                        <div className="p-3 border-t border-surface-active mt-auto">
-                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors text-sm text-text-primary">
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
-                                    CD
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="truncate font-medium">Chitrank Dixit</div>
-                                </div>
-                            </div>
-                        </div>
+
                     </motion.aside>
                 </>
             )}

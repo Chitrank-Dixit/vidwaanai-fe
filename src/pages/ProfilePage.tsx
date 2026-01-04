@@ -14,31 +14,35 @@ export const ProfilePage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-5">
-                <h1 className="text-3xl font-display font-bold leading-tight text-charcoal dark:text-white">
+                <h1 className="text-3xl font-display font-bold leading-tight text-text-primary">
                     Profile Settings
                 </h1>
             </div>
 
-            <div className="bg-white dark:bg-indigo shadow rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div className="bg-surface shadow rounded-lg overflow-hidden border border-text-tertiary/10">
                 <div className="px-4 py-5 sm:p-6">
-                    <h3 className="text-lg font-medium leading-6 text-charcoal dark:text-white mb-4">Account Information</h3>
+                    <h3 className="text-lg font-medium leading-6 text-text-primary mb-4">Account Information</h3>
 
-                    {!isEditing ? (
+                    {!user ? (
+                        <div className="py-8 text-center text-text-tertiary">
+                            Loading profile information...
+                        </div>
+                    ) : !isEditing ? (
                         <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</label>
-                                <div className="sm:col-span-2 text-charcoal dark:text-gray-200 font-medium">{user?.fullName}</div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-text-tertiary/10 pb-4">
+                                <label className="text-sm font-medium text-text-secondary">Full Name</label>
+                                <div className="sm:col-span-2 text-text-primary font-medium">{user.fullName || 'N/A'}</div>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                                <div className="sm:col-span-2 text-charcoal dark:text-gray-200">{user?.email}</div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-text-tertiary/10 pb-4">
+                                <label className="text-sm font-medium text-text-secondary">Email</label>
+                                <div className="sm:col-span-2 text-text-primary">{user.email || 'N/A'}</div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4">
-                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
+                                <label className="text-sm font-medium text-text-secondary">Status</label>
                                 <div className="sm:col-span-2">
-                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                                    <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">
                                         {/* @ts-ignore */}
-                                        {user?.verified || 'Active'}
+                                        {user.verified || 'Active'}
                                     </span>
                                 </div>
                             </div>
