@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { Logo } from '@/components/common/Logo';
 import {
     LayoutDashboard,
     MessageSquare,
@@ -60,10 +61,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             )}
         >
             {/* Logo Area (Desktop Collapsed/Expanded logic) */}
-            <div className={cn("h-16 flex items-center px-6 border-b border-text-tertiary/10", !isOpen && "justify-center px-0")}>
-                <span className="text-xl font-display font-bold text-primary truncate">
-                    {isOpen ? 'Vidwaan' : 'V'}
-                </span>
+            <div className={cn("h-16 flex items-center gap-3 px-6 border-b border-text-tertiary/10", !isOpen && "justify-center px-0")}>
+                <Logo className="h-8 w-8 object-contain" />
+                {isOpen && <span className="text-xl font-display font-bold text-primary truncate">Vidwaan</span>}
             </div>
 
             <nav className="flex-1 py-6 px-3 space-y-8">

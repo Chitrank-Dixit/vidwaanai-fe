@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Logo } from '@/components/common/Logo';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
 
 const registerSchema = z.object({
     fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -54,8 +54,8 @@ export const RegisterForm = () => {
     return (
         <div className="relative w-full max-w-md space-y-8 rounded-xl bg-surface p-8 shadow-2xl border-l-4 border-l-primary border-t border-r border-b border-gray-100 dark:border-gray-800 z-10 transition-transform hover:-translate-y-1 duration-300">
             <div className="text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <Sparkles className="h-8 w-8 text-primary" />
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-4">
+                    <Logo className="h-12 w-12 object-contain" />
                 </div>
                 <h2 className="text-3xl font-display font-bold tracking-tight text-primary">
                     Join Vidwaan AI

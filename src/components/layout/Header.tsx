@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { Logo } from '@/components/common/Logo';
 import { UserDropdown } from './UserDropdown';
 import { Menu } from 'lucide-react';
 
@@ -27,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle: _onMenuToggle, onM
                 {/* Desktop Collapse Toggle (Removed) */}
 
                 <div className="flex items-center gap-2">
+                    <Logo className="h-8 w-8 object-contain" />
                     <span className="text-xl font-display font-bold text-primary">Vidwaan</span>
                 </div>
             </div>
