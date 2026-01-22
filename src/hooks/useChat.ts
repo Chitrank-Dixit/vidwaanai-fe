@@ -221,7 +221,15 @@ export const useChat = (conversationId?: string) => {
             // queryClient.invalidateQueries({ queryKey: ['conversations'] });
 
             // INSTEAD: Manually update the conversation list cache (Optimistic-like)
-            const newId = response.id || response.conversationId || response.session_id || response._id;
+            const newId =
+                // Direct top-level
+                response.id || response._id || response.conversationId || response.conversation_id || response.session_id ||
+                // Nested in .data (common Axios/API pattern)
+                response.data?.id || response.data?._id || response.data?.conversationId ||
+                // Nested in .conversation (some backends wrap it)
+                response.conversation?.id || response.conversation?._id ||
+                // Legacy/Nested structure
+                response.id || response.conversationId || response._id;
             if (newId) {
                 queryClient.setQueryData(['conversations'], (old: any) => {
                     // Check if it's InfiniteData structure
