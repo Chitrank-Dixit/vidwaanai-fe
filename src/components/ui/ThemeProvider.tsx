@@ -34,17 +34,24 @@ export function ThemeProvider({
 
         root.classList.remove('light', 'dark');
 
+        let activeTheme: 'light' | 'dark' = 'light';
         if (theme === 'system') {
             const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
                 .matches
                 ? 'dark'
                 : 'light';
-
+            activeTheme = systemTheme;
             root.classList.add(systemTheme);
-            return;
+        } else {
+            activeTheme = theme;
+            root.classList.add(theme);
         }
 
-        root.classList.add(theme);
+        // Dynamically update favicon
+        const favicon = document.getElementById('favicon') as HTMLLinkElement;
+        if (favicon) {
+            favicon.href = activeTheme === 'dark' ? '/favicon-dark.ico' : '/favicon-light.ico';
+        }
     }, [theme]);
 
     const value = {

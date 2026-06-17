@@ -174,21 +174,26 @@ export const ChatInterface: React.FC = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full relative w-full">
                 {/* Header */}
-                <header className="h-16 border-b border-surface-active bg-surface/80 backdrop-blur-md flex items-center justify-between px-4 sticky top-0 z-30">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary"
-                        >
-                            <Menu className="w-5 h-5" />
-                        </button>
-                        <span className="font-bold text-lg">Vidwaan</span>
-                    </div>
+                <header className="relative h-[102px] bg-[#faf8f5] dark:bg-[#1c1814] flex items-center justify-between px-4 sticky top-0 z-30 flex-shrink-0">
+                    {/* Decorative Background Image */}
+                    <div className="absolute inset-0 bg-[url('/assets/header-light.png')] dark:bg-[url('/assets/header-dark.png')] bg-[length:100%_100%] bg-no-repeat pointer-events-none z-0" />
 
-                    <div className="flex items-center gap-2">
-                        <ThemeToggle />
+                    <div className="relative z-10 flex-1 flex items-center justify-between w-full pr-16 lg:pr-24">
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                className="p-2 hover:bg-surface-hover rounded-lg text-text-secondary"
+                            >
+                                <Menu className="w-5 h-5" />
+                            </button>
+                            <span className="font-bold text-lg">Vidwaan</span>
+                        </div>
 
-                        <UserDropdown user={useAuth().user} />
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+
+                            <UserDropdown user={useAuth().user} />
+                        </div>
                     </div>
                 </header>
 

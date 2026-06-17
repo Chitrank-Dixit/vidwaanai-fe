@@ -8,6 +8,8 @@ import { SuggestedPrompts } from '../components/HomePage/SuggestedPrompts';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { Logo } from '../components/common/Logo';
+import { Footer } from '../components/layout/Footer';
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
@@ -25,18 +27,26 @@ export const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background text-text-primary selection:bg-primary/30">
+        <div className="min-h-screen bg-background text-text-primary selection:bg-primary/30 flex flex-col justify-between">
 
-            {/* Header Placeholder - To be replaced with real header */}
-            <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50">
-                <div className="text-xl font-bold tracking-tight">Vidwaan AI</div>
-                <div className="flex gap-4">
-                    <ThemeToggle />
-                    {/* Add language/menu later */}
+            {/* Header */}
+            <header className="relative h-[102px] bg-[#faf8f5] dark:bg-[#1c1814] flex items-center justify-between px-6 z-50 flex-shrink-0">
+                {/* Decorative Background Image */}
+                <div className="absolute inset-0 bg-[url('/assets/header-light.png')] dark:bg-[url('/assets/header-dark.png')] bg-[length:100%_100%] bg-no-repeat pointer-events-none z-0" />
+                
+                <div className="relative z-10 flex-1 flex items-center justify-between w-full pr-16 lg:pr-24">
+                    <div className="flex items-center gap-2">
+                        <Logo className="h-8 w-8 object-contain" />
+                        <span className="text-xl font-display font-bold text-primary">Vidwaan</span>
+                    </div>
+                    
+                    <div className="flex gap-4">
+                        <ThemeToggle />
+                    </div>
                 </div>
             </header>
 
-            <main>
+            <main className="flex-grow">
                 <HeroSection>
                     <div className="max-w-4xl mx-auto text-center mb-12">
                         <h1 className="text-5xl md:text-7xl font-bold text-text-primary mb-6 tracking-tight">
@@ -70,10 +80,7 @@ export const HomePage: React.FC = () => {
                 <KnowledgeGraphShowcase />
             </main>
 
-            {/* Simple Footer */}
-            <footer className="py-8 border-t border-text-tertiary/10 text-center text-text-tertiary text-sm">
-                <p>© 2024 Vidwaan AI. Preserving Knowledge.</p>
-            </footer>
+            <Footer />
         </div>
     );
 };
