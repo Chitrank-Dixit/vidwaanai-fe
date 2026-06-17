@@ -15,7 +15,7 @@ export const HomePage: React.FC = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/dashboard');
+            navigate('/chat');
         }
     }, [isAuthenticated, navigate]);
 
