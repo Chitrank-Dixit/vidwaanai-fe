@@ -30,7 +30,7 @@ export const HomePage: React.FC = () => {
         <div className="min-h-screen bg-background text-text-primary selection:bg-primary/30 flex flex-col justify-between">
 
             {/* Header */}
-            <header className="relative h-[102px] bg-[#faf8f5] dark:bg-[#1c1814] flex items-center justify-between px-6 z-50 flex-shrink-0">
+            <header className="relative h-[102px] bg-background flex items-center justify-between px-6 z-50 flex-shrink-0">
                 <div className="relative z-10 flex-1 flex items-center justify-between w-full pr-16 lg:pr-24">
                     <div className="flex items-center gap-2">
                         <Logo className="h-8 w-8 object-contain" />

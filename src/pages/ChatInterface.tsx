@@ -174,7 +174,7 @@ export const ChatInterface: React.FC = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full relative w-full">
                 {/* Header */}
-                <header className="relative h-[102px] bg-[#faf8f5] dark:bg-[#1c1814] flex items-center justify-between px-4 sticky top-0 z-30 flex-shrink-0">
+                <header className="relative h-[102px] bg-background flex items-center justify-between px-4 sticky top-0 z-30 flex-shrink-0">
                     <div className="relative z-10 flex-1 flex items-center justify-between w-full pr-16 lg:pr-24">
                         <div className="flex items-center gap-3">
                             <button
