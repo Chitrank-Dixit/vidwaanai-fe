@@ -1,11 +1,20 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export const RegisterPage: React.FC = () => {
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <div className="flex min-h-screen bg-background text-text-primary relative">

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { HeroSection } from '../components/HomePage/HeroSection';
 import { FeaturesGrid } from '../components/HomePage/FeaturesGrid';
 import { KnowledgeGraphShowcase } from '../components/HomePage/KnowledgeGraphShowcase';
@@ -10,6 +11,13 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSearch = (text: string) => {
         if (!text.trim()) return;

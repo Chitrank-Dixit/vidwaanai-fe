@@ -26,4 +26,16 @@ describe('Navigation Integration', () => {
         // Check for specific heading or unique element
         expect(screen.getAllByText(/Vidwaan/i)[0]).toBeInTheDocument()
     })
+
+    it('redirects to dashboard when authenticated on homepage', () => {
+        (useAuth as any).mockReturnValue({
+            isAuthenticated: true,
+            user: { fullName: 'Test User', email: 'test@example.com' },
+            isLoading: false
+        })
+
+        render(<App />)
+        // Check for dashboard elements
+        expect(screen.getByText(/Welcome, Test User!/i)).toBeInTheDocument()
+    })
 })
