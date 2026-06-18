@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { Logo } from '@/components/common/Logo';
 import { UserDropdown } from './UserDropdown';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 import { ThemeToggle } from '../ui/ThemeToggle';
 
@@ -14,30 +15,30 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle: _onMenuToggle, onM
     const { user } = useAuth();
 
     return (
-        <header className="h-16 bg-surface border-b border-text-tertiary/10 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
-            <div className="flex items-center gap-4">
-                {/* Mobile Toggle */}
-                <button
-                    className="lg:hidden p-2 text-text-primary hover:bg-surface-hover rounded-md"
-                    onClick={onMobileMenuToggle}
-                >
-                    <Menu className="h-6 w-6" />
-                </button>
+        <header className="relative h-[102px] bg-background border-none flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30 flex-shrink-0">
+            <div className="relative z-10 flex-1 flex items-center justify-between w-full pr-16 lg:pr-24">
+                <div className="flex items-center gap-4">
+                    {/* Mobile Toggle */}
+                    <button
+                        className="lg:hidden p-2 text-text-primary hover:bg-surface-hover rounded-md"
+                        onClick={onMobileMenuToggle}
+                    >
+                        <Menu className="h-6 w-6" />
+                    </button>
 
-                {/* Desktop Collapse Toggle (Removed) */}
+                    {/* Desktop Collapse Toggle (Removed) */}
 
-                <div className="flex items-center gap-2">
-                    <span className="text-xl font-display font-bold text-primary">🕉️ Vidwaan</span>
+                    <div className="flex items-center gap-2">
+                        <Logo className="h-8 w-8 object-contain" />
+                        <span className="text-xl font-display font-bold text-primary">Vidwaan</span>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-                <ThemeToggle />
-                <button className="p-2 text-text-primary hover:bg-surface-hover rounded-full transition-colors relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
-                </button>
-                <UserDropdown user={user} />
+                <div className="flex items-center gap-4">
+                    <ThemeToggle />
+
+                    <UserDropdown user={user} />
+                </div>
             </div>
         </header>
     );

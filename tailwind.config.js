@@ -18,18 +18,18 @@ export default {
                 text: {
                     primary: 'var(--color-text-primary)',
                     secondary: 'var(--color-text-secondary)',
-                    tertiary: 'var(--color-text-tertiary)',
+                    tertiary: 'rgb(var(--color-text-tertiary) / <alpha-value>)',
                     inverse: 'var(--color-text-inverse)',
                 },
                 primary: {
-                    DEFAULT: 'var(--color-primary)',
-                    dark: 'var(--color-primary-dark)',
+                    DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+                    dark: 'rgb(var(--color-primary-dark) / <alpha-value>)',
                 },
                 secondary: {
-                    DEFAULT: 'var(--color-secondary)',
-                    dark: 'var(--color-secondary-dark)',
+                    DEFAULT: 'rgb(var(--color-secondary) / <alpha-value>)',
+                    dark: 'rgb(var(--color-secondary-dark) / <alpha-value>)',
                 },
-                accent: 'var(--color-accent)',
+                accent: 'rgb(var(--color-accent) / <alpha-value>)',
 
                 // Functional
                 success: 'var(--color-success)',

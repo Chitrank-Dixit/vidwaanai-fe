@@ -30,7 +30,7 @@ export const Dashboard: React.FC = () => {
         <div className="space-y-6">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-5">
                 <h1 className="text-3xl font-display font-bold leading-tight text-charcoal dark:text-white">
-                    Welcome, {user?.fullName || 'Seeker'}! 🕉️
+                    Welcome, {user?.fullName || 'Seeker'}!
                 </h1>
                 <p className="mt-2 max-w-4xl text-sm text-gray-500 dark:text-gray-400">
                     Continue your spiritual exploration with Vidwaan.

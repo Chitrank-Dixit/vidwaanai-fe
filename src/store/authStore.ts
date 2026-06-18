@@ -16,8 +16,8 @@ interface AuthState {
     checkAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-    user: null,
+export const useAuthStore = create<AuthState>((set, get) => ({
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     isAuthenticated: !!localStorage.getItem('accessToken'),
     isLoading: false,
     error: null,
@@ -26,6 +26,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await authAPI.login(credentials);
+            if (response.data.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
             set({
                 user: response.data.user,
                 isAuthenticated: true,
@@ -49,6 +52,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             // but commonly we might want to redirect to login or auto-login.
             // Here we just update state if user is returned.
             if (response.data.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
                 set({ user: response.data.user });
             }
             set({ isLoading: false });
@@ -69,6 +73,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             console.error('Logout error', error);
         } finally {
             // Clear local state regardless of server response
+            localStorage.removeItem('user');
             set({
                 user: null,
                 isAuthenticated: false,
@@ -80,8 +85,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     clearError: () => set({ error: null }),
 
-    checkAuth: () => {
+    checkAuth: async () => {
         const token = localStorage.getItem('accessToken');
-        set({ isAuthenticated: !!token });
+        if (token) {
+            set({ isAuthenticated: true });
+            // Fetch user profile if missing
+            if (!get().user) {
+                try {
+                    const response = await authAPI.getMe();
+                    if (response.data.user) {
+                        set({ user: response.data.user });
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch user profile:', error);
+                    // Optionally logout if token is invalid, but let's be safe for now
+                }
+            }
+        } else {
+            set({ isAuthenticated: false, user: null });
+        }
     }
 }));

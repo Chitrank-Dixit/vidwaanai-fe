@@ -22,6 +22,6 @@ describe('MainLayout', () => {
         );
 
         expect(screen.getByText('Child Content')).toBeInTheDocument();
-        expect(screen.getAllByText(/🕉️ Vidwaan/i)[0]).toBeInTheDocument();
+        expect(screen.getAllByText(/Vidwaan/i)[0]).toBeInTheDocument();
     });
 });

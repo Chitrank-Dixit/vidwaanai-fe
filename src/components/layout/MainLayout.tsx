@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from './Header';
 import { MobileNav } from './MobileNav';
+import { Footer } from './Footer';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -24,6 +25,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         {children}
                     </div>
                 </main>
+
+                <Footer />
             </div>
 
             {mobileMenuOpen && <MobileNav onClose={() => setMobileMenuOpen(false)} />}
